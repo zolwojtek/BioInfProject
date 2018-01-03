@@ -1,0 +1,54 @@
+CLUSTAL W (1.83) multiple sequence alignment
+
+brca1_bos_taurus         -AT--GGATT-TATCTGCGGATCATGTTGAAGA-AGTAC---------AA
+brca1_canis_lupus        -AT--GGATT-TATCTGCGGATCGTGTTGAAGA-AGTAC---------AA
+brca1_gallus_gallus      -GC--GAAATGTAACA-CGGTAGAGG-TGATCGGGGTGC---------G-
+brca1_homo_sapiens       -GT--ACCTT-GATTTCGTATT-CTGA-GAGGCTGCTGC---------TT
+brca1_macaca_mulatta     -AT--GGATT-TATCTGCTGTTCGCGTTGAAGA-AGTAC---------AA
+brca1_mus_musculus       -GTTCCGAAA-GGCTAGCGCTAGGCGC-CAAGC-GGCCG---------GT
+brca1_pan_troglodytes    -AT--GGATT-TATCTGCTCTTCGCGTTGAAGA-AGTAC---------AA
+brca1_rattus_norvegicus  CGC--TGGTG-CAACT-----------CGAAGA-CCTATCTCCTTCCCGG
+                                                      *                    
+
+brca1_bos_taurus         AATGTCC--TCAATGCTATGCA-GAAAATCTTAG--AGTGTCCAATATGT
+brca1_canis_lupus        AATGTTC--TTAATGCTATGCA-GAAAATCTTAG--AGTGTCCAATATGT
+brca1_gallus_gallus      ----TTA--TACGTGC-GTG----GTGACCTCGGTCGGTGTTGACGGTGC
+brca1_homo_sapiens       AGCGGTAGCCCCTTGGTTTCCGTGGCAACGGAAA--AGCGCG----GGAA
+brca1_macaca_mulatta     AATGTCA--TTAATGCTATGCA-GAAAATCTTAG--AGTGTCCAATCTGT
+brca1_mus_musculus       TTCCTTG--GCGACGGAGAGCGCGGGAATTTTAG--ATAGAT---TGTAA
+brca1_pan_troglodytes    AATGTCA--TTAACGCTATGCA-GAAAATCTTAG--AGTGTCCCATCTGT
+brca1_rattus_norvegicus  GGGGGCT--TCTCCGGCATTTA-G---GCCTCGG--CGTTTGGAAG-TA-
+                                       *                                   
+
+brca1_bos_taurus         CTGGAGT--TGATC-----AAA--GA-GCCTGTC--TCTACAAAGTGTGA
+brca1_canis_lupus        CTGGAGT--TGATC-----AAA--GA-GCCTGTT--TCTACAAAGTGTGA
+brca1_gallus_gallus      CTGGGGT--TCCTC-----AGA--GT-GTTTTGGGGTCTGAAGGATG-GA
+brca1_homo_sapiens       TTACA-----GATA-----AATTA-A-AACTGCGACTGCGCGGCGT--GA
+brca1_macaca_mulatta     CTGGAGT--TGATC-----AAG--GA-ACCTGTC--TCCACAAAGTGTGA
+brca1_mus_musculus       TTGCGGC--TGCGC-----GGCCGCT-GCCCGTGCAGCCAGAGGAT-CCA
+brca1_pan_troglodytes    CTGGAGT--TGATC-----AAG--GA-ACCTGTC--TCCACAAAGTGTGA
+brca1_rattus_norvegicus  CGGAGGTTTTTCTCGGAAGAAA--GTTCACTGGAAGTGGAAGAAATGGAT
+                                                                      *    
+
+brca1_bos_taurus         C--CAC--ATATTTTGCAAATT--TTGTATG--CTGAAACTTC--TCAA-
+brca1_canis_lupus        T--CAC--ATATTTTGCAAATT--TTGTATG--CTGAAACTTC--TCAA-
+brca1_gallus_gallus      CTTGTCAG--TGATTGCCA-TTGGAGACGTG--CAAAATGTGCTTTCAG-
+brca1_homo_sapiens       GCTCGCTGAGACTTCCTGGACGGGGGACAGG--CTGTGGGGTT--TCT--
+brca1_macaca_mulatta     C--CAC--ATATTTTGCAGATT--TTGCATG--CTGAAACTTC--TCAA-
+brca1_mus_musculus       G--CAC--CTCTCTTGGGGCTT--CTCCGTC--CTCG--GCGC--TTG--
+brca1_pan_troglodytes    C--CAC--ATATTTTGCAAATT--TTGCATG--CTGAAACTTC--TCAA-
+brca1_rattus_norvegicus  T--TAT--CTGCTGTTCGAATT--CAAGAAGTACAAAATGTCCT-TCATG
+                                                          *           *    
+
+brca1_bos_taurus         CCAGAAGAAAGGGCCT----TCACAATGTCCTTTGTGTA-AGA-A-TGA
+brca1_canis_lupus        CCAGAGGAAGGGGCCT----TCACAGTGTCCTTTGTGTA-AGA-A-CGA
+brca1_gallus_gallus      CCATGCAGAAGAA-C-TT----GGAGTGTCCAGTCTGTTTAGATGTGAT
+brca1_homo_sapiens       -CAGATAACTGGGCCCCTGCGCTCAGG-AGGCCTT---C-ACC-C-TCT
+brca1_macaca_mulatta     CCAGAAGAAAGGGCCT----TCACAGTGTCCTTTGTGTA-AGA-A-TGA
+brca1_mus_musculus       -G--AAGTACGGATCTTTTTTCTCGGAGAAAAGTTCACT-GGA-A-CTG
+brca1_pan_troglodytes    CCAGAAGAAAGGGCCT----TCACAGTGTCCTTTATGTA-AGA-A-TGA
+brca1_rattus_norvegicus  CTA--TGCAGAAAATC----TTGGAGTGTCCAATCT--------G-TTT
+                                                          *               
+
+
+

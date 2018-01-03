@@ -1,0 +1,61 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2006
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BioStringAlgorithms", "StringAlgorithms\BioStringAlgorithms.csproj", "{2BD08562-8A36-492C-B0AB-4887743B41F5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BioStringAlgorithms.Tests", "BioStringAlgorithms.Tests\BioStringAlgorithms.Tests.csproj", "{C5C167ED-FE33-4C04-B36E-71DED23E7CD0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SequenceParser", "SequenceParser\SequenceParser.csproj", "{FC248A78-D696-4F12-93D4-6DBF75E23C33}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlignmentMarger", "AlignmentMarger\AlignmentMarger.csproj", "{3CE1D9B6-851B-4458-9CE2-53645E2EF482}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2BD08562-8A36-492C-B0AB-4887743B41F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2BD08562-8A36-492C-B0AB-4887743B41F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BD08562-8A36-492C-B0AB-4887743B41F5}.Debug|x64.ActiveCfg = Debug|x64
+		{2BD08562-8A36-492C-B0AB-4887743B41F5}.Debug|x64.Build.0 = Debug|x64
+		{2BD08562-8A36-492C-B0AB-4887743B41F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2BD08562-8A36-492C-B0AB-4887743B41F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2BD08562-8A36-492C-B0AB-4887743B41F5}.Release|x64.ActiveCfg = Release|x64
+		{2BD08562-8A36-492C-B0AB-4887743B41F5}.Release|x64.Build.0 = Release|x64
+		{C5C167ED-FE33-4C04-B36E-71DED23E7CD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5C167ED-FE33-4C04-B36E-71DED23E7CD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5C167ED-FE33-4C04-B36E-71DED23E7CD0}.Debug|x64.ActiveCfg = Debug|x64
+		{C5C167ED-FE33-4C04-B36E-71DED23E7CD0}.Debug|x64.Build.0 = Debug|x64
+		{C5C167ED-FE33-4C04-B36E-71DED23E7CD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5C167ED-FE33-4C04-B36E-71DED23E7CD0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5C167ED-FE33-4C04-B36E-71DED23E7CD0}.Release|x64.ActiveCfg = Release|x64
+		{C5C167ED-FE33-4C04-B36E-71DED23E7CD0}.Release|x64.Build.0 = Release|x64
+		{FC248A78-D696-4F12-93D4-6DBF75E23C33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC248A78-D696-4F12-93D4-6DBF75E23C33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC248A78-D696-4F12-93D4-6DBF75E23C33}.Debug|x64.ActiveCfg = Debug|x64
+		{FC248A78-D696-4F12-93D4-6DBF75E23C33}.Debug|x64.Build.0 = Debug|x64
+		{FC248A78-D696-4F12-93D4-6DBF75E23C33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC248A78-D696-4F12-93D4-6DBF75E23C33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC248A78-D696-4F12-93D4-6DBF75E23C33}.Release|x64.ActiveCfg = Release|x64
+		{FC248A78-D696-4F12-93D4-6DBF75E23C33}.Release|x64.Build.0 = Release|x64
+		{3CE1D9B6-851B-4458-9CE2-53645E2EF482}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CE1D9B6-851B-4458-9CE2-53645E2EF482}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3CE1D9B6-851B-4458-9CE2-53645E2EF482}.Debug|x64.ActiveCfg = Debug|x64
+		{3CE1D9B6-851B-4458-9CE2-53645E2EF482}.Debug|x64.Build.0 = Debug|x64
+		{3CE1D9B6-851B-4458-9CE2-53645E2EF482}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3CE1D9B6-851B-4458-9CE2-53645E2EF482}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3CE1D9B6-851B-4458-9CE2-53645E2EF482}.Release|x64.ActiveCfg = Release|x64
+		{3CE1D9B6-851B-4458-9CE2-53645E2EF482}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A66C735B-870C-4145-B40C-067CBDC1AFAE}
+	EndGlobalSection
+EndGlobal

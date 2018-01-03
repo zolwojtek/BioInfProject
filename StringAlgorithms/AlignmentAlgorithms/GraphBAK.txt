@@ -1,0 +1,168 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace StringAlgorithms
+{
+    public class ANode
+    {
+        public List<int> Neighbours { get; set; }
+        public char Character { get; set; }
+        public int Id { get; set; }
+        public Node(int id)
+        {
+            this.Neighbours = new List<int>();
+            this.Id = id;
+        }
+
+        public ANode(char character, int id)
+        {
+            this.Neighbours = new List<int>();
+            this.Character = character;
+            this.Id = id;
+        }
+    }
+
+    public class Graph
+    {
+        public List<Node> Nodes { get; set; }
+        public Graph(int size)
+        {
+            this.Nodes = new List<Node>();
+            for (int i = 0; i < size; ++i)
+            {
+                this.Nodes.Add(new Node(i));
+            }
+        }
+
+        public void AddEdge(int u, int v)
+        {
+            Nodes[u].Neighbours.Add(v);
+        }
+
+        public int AddNode(char sign)
+        {
+            int index = Nodes.Count();
+            Nodes.Add(new Node(sign, index));
+            return index;
+        }
+
+        public void AddNodeAfter(int u, char sign)
+        {
+            int idx = AddNode(sign);
+            Nodes[idx].Neighbours.Add(Nodes[u].Neighbours.First());
+            Nodes[u].Neighbours[0] = idx;
+        }
+
+        public void FitInitSequence(string initSequence)
+        {
+            //Creating edge between front sentry and the beginning of the sequence
+            AddEdge(0, 1);
+            for (int i = 1; i <= initSequence.Length; ++i)
+            {
+                Nodes[i].Character = initSequence[i - 1];
+                if (i < initSequence.Length)
+                    AddEdge(i, i + 1);
+            }
+            //Creating edge between back sentry and the end of the sequence
+            AddEdge(initSequence.Length, initSequence.Length + 1);
+            //The back entry is recognizable by sign '0' 
+            Nodes[initSequence.Length + 1].Character = '0';
+        }
+
+        public Alignment GetAlignment(int seqNum)
+        {
+            //wywalic to do klasy Graph tak w ogole
+            List<string> aligments = new List<string>();
+            for (int i = 0; i < seqNum; ++i)
+            {
+                aligments.Add("");
+            }
+
+            //alignmentGraph.Nodes[0].Neighbours.First() <- pierwszy wezeł dopasowania, dodać odpowiednia funkcje w GRPAPH
+            Node node = Nodes[Nodes[0].Neighbours.First()];
+            //dopoki nie natrafimy na wartownika...dodac stala Graph.SENTURY
+            //wywalic to calosc do visitora :OO
+            while (node.Character != '0')
+            {
+                aligments[0] += node.Character;
+                for (int k = 1; k < seqNum; ++k)
+                {
+                    aligments[k] += Nodes[node.Neighbours[k]].Character;
+                }
+                node = Nodes[node.Neighbours[0]];
+            }
+            //to jest spoko, do wywalenia do osobnej funkcji, jak bede dodawac stringBuildery
+            List<Sequence> seqWithNames = new List<Sequence>();
+            for (int i = 0; i < seqNum; ++i)
+            {
+                seqWithNames.Add(new Sequence(Constants.ALIGNMENT_DNA, "name<-tobeChanged", aligments[i]));
+            }
+            return new Alignment(seqWithNames);
+        }
+
+        public void AddSequenceToCurrentAlignment(Alignment alignment, int it)
+        {
+            //czyzby to nadawalo sie na kolejnego visitora??? nie, bo zminia konstrukcje
+            int alignmentItereator = 0;
+            int prevNodeId = 0;
+            //alignment.Sequences[0] = base sequence, alignment.Sequences[1] = new seqence that we need to add
+            char s0 = alignment.Sequences[0].Value[alignmentItereator];
+            char s1 = alignment.Sequences[1].Value[alignmentItereator];
+            //znowu wbieramy pierwszy wezeł dopasowania
+            Node node = Nodes[Nodes[0].Neighbours.First()];
+            //dopóki nie napotkamy na wartownika lub nowe dopasowanie jest dluzsze niz poprzednie i trzeba bedzie wydluzyc graf
+            while (node.Character != '0' || alignmentItereator < alignment.Sequences[0].Value.Length)
+            {
+                char nodeSign = node.Character;
+                //zamienić na switcha?...są 3 opcje...albo dopasowanie, albo w dopasowywanej sekwencji nie ma 
+                //przerwy, która jest a całościowym dopasowaniu, albo na odrót - trzeba dodać przerwe
+                //do grafu
+
+                if (nodeSign == s0)
+                {
+                    int idx = AddNode(s1);
+                    AddEdge(node.Id, idx);
+                    ++alignmentItereator;
+                    if (alignmentItereator < alignment.Sequences[0].Value.Length)
+                    {
+                        s0 = alignment.Sequences[0].Value[alignmentItereator];
+                        s1 = alignment.Sequences[1].Value[alignmentItereator];
+                    }
+                    else//jesli dopasowana sekwencja byla krotsza od dopasowania w grafie
+                    {
+                        s0 = s1 = '-';
+                    }
+                }
+                else
+                {
+                    if (nodeSign == '-')
+                    {
+
+                        int idx = AddNode('-');
+                        AddEdge(node.Id, idx);
+
+                    }
+                    else
+                    {
+                        AddNodeAfter(prevNodeId, '-');
+                        for (int k = 0; k < it; ++k)
+                        {
+                            int idx = AddNode('-');
+                            AddEdge(Nodes[prevNodeId].Neighbours.First(), idx);
+                        }
+
+                        node = Nodes[prevNodeId];
+                    }
+                }
+                prevNodeId = node.Id;
+                node = Nodes[node.Neighbours.First()];
+
+            }
+
+        }
+
+    }
+}
