@@ -75,14 +75,14 @@ namespace StringAlgorithms
             fromLeftNeighborCost = ComputeCostOfMatching(currentCell.GetLeftNeighbor(), AlignmentType.MATCH_WITH_GAP);
         }
 
-        private int ComputeCostOfMatching(Cell fromCell, AlignmentType aligmentType)
+        private int ComputeCostOfMatching(Cell fromCell, AlignmentType alignmentType)
         {
             if (fromCell.rowIndex >= 0 && fromCell.columnIndex >= 0)
             {
                 int costOfSignsAlignment = 0;
-                if (aligmentType == AlignmentType.MATCH_WITH_GAP)
+                if (alignmentType == AlignmentType.MATCH_WITH_GAP)
                     costOfSignsAlignment = parameters.CostArray.GapCostFun(1); //takie srednie
-                else
+                else if (alignmentType == AlignmentType.MATCH_SIGNS)
                 {
                     costOfSignsAlignment = parameters.CostArray.GetLettersAlignmentCost(parameters.Sequences[0].Value[fromCell.rowIndex], parameters.Sequences[1].Value[fromCell.columnIndex]);//slabe
                 }
@@ -118,7 +118,7 @@ namespace StringAlgorithms
             iterator.SetToCell(new Cell(array.rowSize, array.columnSize));
             Cell currentCell = (Cell)iterator.GetCurrentCell();
 
-            while (!IsTopLeftCellOfAlignmentArray(currentCell))
+            while (currentCell.IsTopLeftCell() == false)
             {
                 Cell newCell = GoOneStepBack(currentCell, iterator);
                 Direction direction = GetDirection(currentCell, newCell);

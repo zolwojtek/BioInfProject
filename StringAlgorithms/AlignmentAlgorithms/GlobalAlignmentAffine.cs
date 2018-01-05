@@ -142,34 +142,47 @@ namespace StringAlgorithms
             return bestCost;
         }
 
-
         public override int GetOptimalAlignmentScore()
-        {
+        {        
             ComputeSolutionIfNecessary();
-            int n = parameters.Sequences[0].Value.Length;
-            int m = parameters.Sequences[1].Value.Length;
-            return alignmentArray[n, m];
+            Cell bestScoreCell = alignmentArray2.GetCell(alignmentArray2.rowSize, alignmentArray2.columnSize);
+            int optimalScore = bestScoreCell.value;
+            return optimalScore;
         }
 
+        private StringBuilder firstSeqenceOfAlignment = null;
+        private StringBuilder secondSequenceOfAlignment = null;
 
 
         private Alignment GetAligment()
         {
-            int i = parameters.Sequences[0].Value.Length;
-            int j = parameters.Sequences[1].Value.Length;
+            ArrayIterator iterator = alignmentArray2.GetIterator();
+            iterator.SetToCell(new Cell(alignmentArray2.rowSize, alignmentArray2.columnSize));
+            Cell currentCell = (Cell)iterator.GetCurrentCell();
+
+     
+
+
+            //int i = parameters.Sequences[0].Value.Length;
+            //int j = parameters.Sequences[1].Value.Length;
             String answerSeq1 = "";
             String answerSeq2 = "";
 
-            int[,] array = alignmentArray;
 
-            while (!(i == 0 && j == 0))
+            while (currentCell.IsTopLeftCell() == false)
             {
-                if (i > 0 && j > 0 && alignmentArray[i, j] == alignmentArray[i - 1, j - 1] + parameters.CostArray.GetLettersAlignmentCost(parameters.Sequences[0].Value[i - 1], parameters.Sequences[1].Value[j - 1]))
+                currentCell = (Cell)iterator.GetCurrentCell();
+                int i = currentCell.rowIndex;
+                int j = currentCell.columnIndex;
+
+
+                int upCost = ComputeCostOfMatchingSigns(currentCell.GetUpDiagonalNeighbor());
+                if (i > 0 && j > 0 && alignmentArray[i, j] == upCost)
                 {
                     answerSeq1 = parameters.Sequences[0].Value[i - 1] + answerSeq1;
                     answerSeq2 = parameters.Sequences[1].Value[j - 1] + answerSeq2;
-                    --i;
-                    --j;
+
+                    currentCell = (Cell)iterator.Diagonal();
                 }
                 else
                 {
@@ -183,7 +196,10 @@ namespace StringAlgorithms
                                 answerSeq1 = parameters.Sequences[0].Value[i - 1 - it] + answerSeq1;
                                 answerSeq2 = @"-" + answerSeq2;
                             }
-                            i -= k;
+                            currentCell.rowIndex -= k;
+                            iterator.SetToCell(currentCell);
+                            //currentCell = 
+                            //i -= k;
                             break;
                         }
                         else if (j >= k && alignmentArray[i, j] == alignmentArray[i, j - k] + parameters.CostArray.GapCostFun(k))
@@ -193,7 +209,9 @@ namespace StringAlgorithms
                                 answerSeq2 = parameters.Sequences[1].Value[j - 1 - it] + answerSeq2;
                                 answerSeq1 = @"-" + answerSeq1;
                             }
-                            j -= k;
+                            currentCell.columnIndex -= k;
+                            iterator.SetToCell(currentCell);
+                            //j -= k;
                             break;
                         }
                         else
@@ -207,8 +225,6 @@ namespace StringAlgorithms
             Sequence alignmentSeq2 = new Sequence(Constants.ALIGNMENT_DNA, parameters.Sequences[1].Name, answerSeq2);
             return new Alignment(alignmentSeq1, alignmentSeq2);
         }
-
-
 
         public override int GetNumberOfOptimalSolutions()
         {

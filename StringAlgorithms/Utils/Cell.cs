@@ -16,15 +16,7 @@ namespace StringAlgorithms.Utils
             this.rowIndex = rowIndex;
             this.columnIndex = columnIndex;
             this.value = value;
-            //CheckIfTheCellIsLegal();
-        }
 
-        private void CheckIfTheCellIsLegal()
-        {
-            if(rowIndex < 0 || columnIndex < 0)
-            {
-                throw new ArgumentException("Cell's coordinates must be >= 0!");
-            }
         }
 
         public Cell GetUpNeighbor()
@@ -40,6 +32,18 @@ namespace StringAlgorithms.Utils
         public Cell GetLeftNeighbor()
         {
             return new Cell(rowIndex, columnIndex - 1);
+        }
+
+        public bool IsTopLeftCell()
+        {
+            if(this.rowIndex == 0 && this.columnIndex == 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }
