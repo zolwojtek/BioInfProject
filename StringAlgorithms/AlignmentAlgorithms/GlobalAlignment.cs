@@ -68,11 +68,11 @@ namespace StringAlgorithms
             array.SetCell(cell);
         }
 
-        private void ComputeGoingFromNeighborsCosts(Cell currentCell)
+        private void ComputeGoingFromNeighborsCosts(Cell destinationCell)
         {
-            fromDiagonalNeighborCost = ComputeCostOfMatching(currentCell.GetUpDiagonalNeighbor(), AlignmentType.MATCH_SIGNS);
-            fromUpNeighborCost = ComputeCostOfMatching(currentCell.GetUpNeighbor(), AlignmentType.MATCH_WITH_GAP);
-            fromLeftNeighborCost = ComputeCostOfMatching(currentCell.GetLeftNeighbor(), AlignmentType.MATCH_WITH_GAP);
+            fromDiagonalNeighborCost = ComputeCostOfMatching(destinationCell.GetUpDiagonalNeighbor(), AlignmentType.MATCH_SIGNS);
+            fromUpNeighborCost = ComputeCostOfMatching(destinationCell.GetUpNeighbor(), AlignmentType.MATCH_WITH_GAP);
+            fromLeftNeighborCost = ComputeCostOfMatching(destinationCell.GetLeftNeighbor(), AlignmentType.MATCH_WITH_GAP);
         }
 
         private int ComputeCostOfMatching(Cell fromCell, AlignmentType alignmentType)
@@ -126,7 +126,6 @@ namespace StringAlgorithms
                 FetchSignsOfAlignment(newCell.rowIndex, newCell.columnIndex, direction);
                 currentCell = newCell;
             }
-
             Sequence firstAlignmentSeq = new Sequence(Constants.ALIGNMENT_DNA, parameters.Sequences[0].Name, firstSeqenceOfAlignment.ToString()); ///TODO BRZYDKIE!!!!!
             Sequence secondAlignmentSeq = new Sequence(Constants.ALIGNMENT_DNA, parameters.Sequences[1].Name, secondSequenceOfAlignment.ToString());
             computedAlignment = new Alignment(firstAlignmentSeq, secondAlignmentSeq);
@@ -231,7 +230,7 @@ namespace StringAlgorithms
         {
             int optimalSolutionsNumber = 0;
             Cell cell = (Cell)iterator.GetCurrentCell();
-            if (IsTopLeftCellOfAlignmentArray(cell))
+            if (cell.IsTopLeftCell())
             {
                 return 1;
             }

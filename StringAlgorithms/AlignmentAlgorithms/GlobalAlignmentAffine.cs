@@ -1,4 +1,5 @@
-﻿using StringAlgorithms.Utils;
+﻿using StringAlgorithms.Enums;
+using StringAlgorithms.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +10,17 @@ namespace StringAlgorithms
 {
     public class GlobalAlignmentAffine : TextAlignmentAlgorithm
     {
-        private int[,] P;
-        private int[,] Q;
+        private int verticalGapsCost;
+        private int horizontalGapsCost;
+        private int fromDiagonalNeighborCost = 0;
+        private int fromUpNeighborCost = 0;
+        private int fromLeftNeighborCost = 0;
         private AlignmentArray alignmentArray2;
         private AlignmentArray helpArrayP;
         private AlignmentArray helpArrayQ;
+        private Alignment computedAlignment = null;
+        private StringBuilder firstSeqenceOfAlignment = null;
+        private StringBuilder secondSequenceOfAlignment = null;
 
         public GlobalAlignmentAffine(TextAlignmentParameters parameters) : base(parameters)
         {
@@ -22,11 +29,12 @@ namespace StringAlgorithms
 
         public override Alignment GetOptimalAlignment()
         {
-            ComputeSolutionIfNecessary();
-            return GetAligment();
+            ComputeAlignmentArrayIfNecessary();
+            RetrieveAlignmentIfNecessary();
+            return computedAlignment;
         }
 
-        private void ComputeSolutionIfNecessary()
+        private void ComputeAlignmentArrayIfNecessary()
         {
             if (this.alignmentArray == null)
             {
@@ -40,10 +48,6 @@ namespace StringAlgorithms
             int alignmentArrayRowNumber = parameters.Sequences[0].Value.Length;
             int alignmentArrayColumnNumber = parameters.Sequences[1].Value.Length;
 
-            this.alignmentArray = new int[alignmentArrayRowNumber + 1, alignmentArrayColumnNumber + 1];
-            this.P = new int[alignmentArrayRowNumber + 1, alignmentArrayColumnNumber + 1];
-            this.Q = new int[alignmentArrayRowNumber + 1, alignmentArrayColumnNumber + 1];
-
             alignmentArray2 = new AlignmentArray();
             helpArrayP = new AlignmentArray();
             helpArrayQ = new AlignmentArray();
@@ -54,11 +58,6 @@ namespace StringAlgorithms
 
             helpArrayP.FillRowWithValue(0, (x) => (int.MaxValue / 2));
             helpArrayQ.FillColumnWithValue(0, (x) => (int.MaxValue / 2));
-
-            alignmentArray.FillColumnWithIntValue(0, (x) => (parameters.CostArray.GapCostFun(x)));
-            alignmentArray.FillRowWithIntValue(0, (x) => (parameters.CostArray.GapCostFun(x)));
-            P.FillRowWithIntValue(0, (x) => (int.MaxValue / 2));
-            Q.FillColumnWithIntValue(0, (x) => (int.MaxValue / 2));
         }
 
         protected override void ComputeAlignmentArray()
@@ -71,38 +70,27 @@ namespace StringAlgorithms
             }
         }
 
-        int fromDiagonalNeighborCost;
-        int fromUpNeighborCost;
-        int fromLeftNeighborCost;
-
         private void ComputeCell(Cell cell)
         {
-            int i = cell.rowIndex;
-            int j = cell.columnIndex;
-
+            int cellRow = cell.rowIndex;
+            int celColumn = cell.columnIndex;
 
             ComputeGoingFromNeighborsCosts(cell);
             cell.value = GetTheBestComingFromNeigborCost();
-
             alignmentArray2.SetCell(cell);
 
-            Cell cellP = new Cell(i, j, fromUpNeighborCost);
-            Cell cellQ = new Cell(i, j, fromLeftNeighborCost);
+            Cell cellP = new Cell(cellRow, celColumn, fromUpNeighborCost);
+            Cell cellQ = new Cell(cellRow, celColumn, fromLeftNeighborCost);
             helpArrayP.SetCell(cellP);
             helpArrayQ.SetCell(cellQ);
-
-            alignmentArray[i, j] = cell.value;
-            P[i, j] = fromUpNeighborCost;
-            Q[i, j] = fromLeftNeighborCost;      
         }
 
-        private void ComputeGoingFromNeighborsCosts(Cell currentCell)
+        private void ComputeGoingFromNeighborsCosts(Cell destinationCell)
         {
-            fromUpNeighborCost = ComputeCostOfMatching(currentCell.GetUpNeighbor(), helpArrayP, AlignmentType.MATCH_WITH_GAP);
-            fromLeftNeighborCost = ComputeCostOfMatching(currentCell.GetLeftNeighbor(), helpArrayQ, AlignmentType.MATCH_WITH_GAP);
-            fromDiagonalNeighborCost = ComputeCostOfMatching(currentCell.GetUpDiagonalNeighbor(), null, AlignmentType.MATCH_SIGNS);
+            fromUpNeighborCost = ComputeCostOfMatching(destinationCell.GetUpNeighbor(), helpArrayP, AlignmentType.MATCH_WITH_GAP);
+            fromLeftNeighborCost = ComputeCostOfMatching(destinationCell.GetLeftNeighbor(), helpArrayQ, AlignmentType.MATCH_WITH_GAP);
+            fromDiagonalNeighborCost = ComputeCostOfMatching(destinationCell.GetUpDiagonalNeighbor(), null, AlignmentType.MATCH_SIGNS);
         }
-
 
         private int ComputeCostOfMatching(Cell cell, AlignmentArray helpArray, AlignmentType alignmentType)
         {
@@ -120,19 +108,18 @@ namespace StringAlgorithms
 
         private int ComputeCostOfMatchingWithGap(Cell cell, AlignmentArray helpArray)
         {
-            int i = cell.rowIndex;
-            int j = cell.columnIndex;
-            int gapStartingCost = alignmentArray2.GetCell(i,j).value + parameters.CostArray.GetGapStartingCost();
-            int gapExtensionCost = helpArray.GetCell(i,j).value + parameters.CostArray.GetGapExtensionCost();
+            int cellRow = cell.rowIndex;
+            int cellColumn = cell.columnIndex;
+            int gapStartingCost = alignmentArray2.GetCell(cellRow, cellColumn).value + parameters.CostArray.GetGapStartingCost();
+            int gapExtensionCost = helpArray.GetCell(cellRow, cellColumn).value + parameters.CostArray.GetGapExtensionCost();
             return parameters.Comparefunction(gapStartingCost, gapExtensionCost);
         }
 
         private int ComputeCostOfMatchingSigns(Cell cell)
         {
-            int i = cell.rowIndex;
-            int j = cell.columnIndex;
-
-            int cost = alignmentArray[i, j] + parameters.CostArray.GetLettersAlignmentCost(parameters.Sequences[0].Value[i], parameters.Sequences[1].Value[j]);
+            int cellRow = cell.rowIndex;
+            int cellColumn = cell.columnIndex;
+            int cost = alignmentArray2.GetCell(cellRow, cellColumn).value + parameters.CostArray.GetLettersAlignmentCost(parameters.Sequences[0].Value[cellRow], parameters.Sequences[1].Value[cellColumn]);
             return cost;
         }
 
@@ -142,129 +129,249 @@ namespace StringAlgorithms
             return bestCost;
         }
 
-        public override int GetOptimalAlignmentScore()
-        {        
-            ComputeSolutionIfNecessary();
-            Cell bestScoreCell = alignmentArray2.GetCell(alignmentArray2.rowSize, alignmentArray2.columnSize);
-            int optimalScore = bestScoreCell.value;
-            return optimalScore;
+        private void RetrieveAlignmentIfNecessary()
+        {
+            if (computedAlignment == null)//TODO: dodać przy zmanie parametrów, że null itd
+            {
+                InitializeSequencesOfAlignment();
+                RetrieveAlignment();
+            }
         }
 
-        private StringBuilder firstSeqenceOfAlignment = null;
-        private StringBuilder secondSequenceOfAlignment = null;
+        private void InitializeSequencesOfAlignment()
+        {
+            firstSeqenceOfAlignment = new StringBuilder("");
+            secondSequenceOfAlignment = new StringBuilder("");
+        }
 
-
-        private Alignment GetAligment()
+        private void RetrieveAlignment()
         {
             ArrayIterator iterator = alignmentArray2.GetIterator();
             iterator.SetToCell(new Cell(alignmentArray2.rowSize, alignmentArray2.columnSize));
             Cell currentCell = (Cell)iterator.GetCurrentCell();
 
-     
-
-
-            //int i = parameters.Sequences[0].Value.Length;
-            //int j = parameters.Sequences[1].Value.Length;
-            String answerSeq1 = "";
-            String answerSeq2 = "";
-
-
             while (currentCell.IsTopLeftCell() == false)
             {
-                currentCell = (Cell)iterator.GetCurrentCell();
-                int i = currentCell.rowIndex;
-                int j = currentCell.columnIndex;
+                Cell newCell = GoOneStepBack(currentCell, iterator);
+                Direction direction = GetDirection(currentCell, newCell);
 
-
-                int upCost = ComputeCostOfMatchingSigns(currentCell.GetUpDiagonalNeighbor());
-                if (i > 0 && j > 0 && alignmentArray[i, j] == upCost)
+                
+                if(direction == Direction.DIAGONAL)
                 {
-                    answerSeq1 = parameters.Sequences[0].Value[i - 1] + answerSeq1;
-                    answerSeq2 = parameters.Sequences[1].Value[j - 1] + answerSeq2;
-
-                    currentCell = (Cell)iterator.Diagonal();
+                    FetchSignsOfAlignment(newCell.rowIndex, newCell.columnIndex, direction);
                 }
-                else
+                else 
                 {
-                    int k = 1;
-                    while (true)
+                    int gapLength = 1;
+                    if (direction == Direction.LEFT)
                     {
-                        if (i >= k && alignmentArray[i, j] == alignmentArray[i - k, j] + parameters.CostArray.GapCostFun(k))
-                        {
-                            for (int it = 0; it < k; ++it)
-                            {
-                                answerSeq1 = parameters.Sequences[0].Value[i - 1 - it] + answerSeq1;
-                                answerSeq2 = @"-" + answerSeq2;
-                            }
-                            currentCell.rowIndex -= k;
-                            iterator.SetToCell(currentCell);
-                            //currentCell = 
-                            //i -= k;
-                            break;
-                        }
-                        else if (j >= k && alignmentArray[i, j] == alignmentArray[i, j - k] + parameters.CostArray.GapCostFun(k))
-                        {
-                            for (int it = 0; it < k; ++it)
-                            {
-                                answerSeq2 = parameters.Sequences[1].Value[j - 1 - it] + answerSeq2;
-                                answerSeq1 = @"-" + answerSeq1;
-                            }
-                            currentCell.columnIndex -= k;
-                            iterator.SetToCell(currentCell);
-                            //j -= k;
-                            break;
-                        }
-                        else
-                        {
-                            ++k;
-                        }
+                        gapLength = currentCell.columnIndex - newCell.columnIndex;
                     }
+                    else if (direction == Direction.UP)
+                    {
+                        gapLength = currentCell.rowIndex - newCell.rowIndex;
+                    }
+                    FetchSeqeunceOfGapsInAlignment(gapLength, newCell, direction);
                 }
+                currentCell = newCell;
             }
-            Sequence alignmentSeq1 = new Sequence(Constants.ALIGNMENT_DNA, parameters.Sequences[0].Name, answerSeq1);
-            Sequence alignmentSeq2 = new Sequence(Constants.ALIGNMENT_DNA, parameters.Sequences[1].Name, answerSeq2);
-            return new Alignment(alignmentSeq1, alignmentSeq2);
+            Sequence firstAlignmentSeq = new Sequence(Constants.ALIGNMENT_DNA, parameters.Sequences[0].Name, firstSeqenceOfAlignment.ToString());// answerSeq1);
+            Sequence secondAlignmentSeq = new Sequence(Constants.ALIGNMENT_DNA, parameters.Sequences[1].Name, secondSequenceOfAlignment.ToString());// answerSeq2);
+            computedAlignment = new Alignment(firstAlignmentSeq, secondAlignmentSeq);
+        }
+
+        private Cell GoOneStepBack(Cell from, ArrayIterator iterator)
+        {
+            Cell newCell;
+            int diagonalCost = ComputeCostOfMatchingSigns(from.GetUpDiagonalNeighbor());
+            int costOfCurrentCell = from.value;
+
+            if (costOfCurrentCell.Equals(diagonalCost))
+            {
+                newCell = (Cell)iterator.Diagonal();
+            }
+            else
+            {
+                int gapLength = 1;
+                while (true)
+                {
+                    ComputeCostOfHavingNGaps(gapLength, from);
+                    if (costOfCurrentCell.Equals(verticalGapsCost))
+                    {
+                        newCell = alignmentArray2.GetCell(from.rowIndex - gapLength, from.columnIndex);
+                        break;
+                    }
+                    else if (costOfCurrentCell.Equals(horizontalGapsCost))
+                    {
+                        newCell = alignmentArray2.GetCell(from.rowIndex, from.columnIndex - gapLength);
+                        break;
+                    }
+                    ++gapLength;
+                }
+                iterator.SetToCell(newCell);
+            }
+            return newCell;
+        }
+
+        private void ComputeCostOfHavingNGaps(int gapLength, Cell from)
+        {
+            int nGapCost = parameters.CostArray.GapCostFun(gapLength);
+            if (from.columnIndex - gapLength >= 0)
+            {
+                horizontalGapsCost = alignmentArray2.GetCell(from.rowIndex, from.columnIndex - gapLength).value + nGapCost;
+            }
+            else
+            {
+                horizontalGapsCost = int.MaxValue / 2;
+            }
+            if (from.rowIndex - gapLength >= 0)
+            {
+                verticalGapsCost = alignmentArray2.GetCell(from.rowIndex - gapLength, from.columnIndex).value + nGapCost;
+            }
+            else
+            {
+                verticalGapsCost = int.MaxValue / 2;
+            }
+        }
+
+        Direction GetDirection(Cell from, Cell to)
+        {
+            int verticalDiff = from.rowIndex - to.rowIndex;
+            int horizontalDiff = from.columnIndex - to.columnIndex;
+            Direction direction;
+            if (verticalDiff != 0 && horizontalDiff != 0)
+            {
+                direction = Direction.DIAGONAL;
+            }
+            else if (verticalDiff != 0)
+            {
+                direction = Direction.UP;
+            }
+            else
+            {
+                direction = Direction.LEFT;
+            }
+            return direction;
+        }
+
+        private void FetchSignsOfAlignment(int indexInFirstSequence, int indexInSecondSequence, Direction direction)
+        {
+            char signFirst = '-';
+            char signSecond = '-';
+            switch (direction)
+            {
+                case Direction.DIAGONAL:
+                    signFirst = parameters.Sequences[0].Value[indexInFirstSequence];
+                    signSecond = parameters.Sequences[1].Value[indexInSecondSequence];
+                    break;
+                case Direction.LEFT:
+                    signFirst = '-';
+                    signSecond = parameters.Sequences[1].Value[indexInSecondSequence];
+                    break;
+                case Direction.UP:
+                    signFirst = parameters.Sequences[0].Value[indexInFirstSequence];
+                    signSecond = '-';
+                    break;
+            }
+            firstSeqenceOfAlignment.Insert(0, signFirst);
+            secondSequenceOfAlignment.Insert(0, signSecond);
+        }
+
+        private void FetchSeqeunceOfGapsInAlignment(int gapLength, Cell startingCell, Direction direction)
+        {
+            int fetchedCellRow = startingCell.rowIndex;
+            int fetchedCellcolumn = startingCell.columnIndex;
+            for (int dist = gapLength - 1; dist >= 0; --dist)
+            {
+                if (direction == Direction.LEFT)
+                {
+                    fetchedCellcolumn = startingCell.columnIndex + dist;
+                }
+                else if (direction == Direction.UP)
+                {
+                    fetchedCellRow = startingCell.rowIndex + dist;
+                }
+                FetchSignsOfAlignment(fetchedCellRow, fetchedCellcolumn, direction);
+            }
+        }
+
+        public override int GetOptimalAlignmentScore()
+        {        
+            ComputeAlignmentArrayIfNecessary();
+            Cell bestScoreCell = alignmentArray2.GetCell(alignmentArray2.rowSize, alignmentArray2.columnSize);
+            int optimalScore = bestScoreCell.value;
+            return optimalScore;
         }
 
         public override int GetNumberOfOptimalSolutions()
         {
-            ComputeSolutionIfNecessary();
-            int i = parameters.Sequences[0].Value.Length;
-            int j = parameters.Sequences[1].Value.Length;
-            int sum = 0;
-            CountNumberOfOptimalSolutions(i, j, ref sum);
-            return sum;
+            ComputeAlignmentArrayIfNecessary();
+            int optimalSolutionsNumber = 0;
+            ArrayIterator iterator = alignmentArray2.GetIterator();
+            iterator.SetToCell(new Cell(alignmentArray2.rowSize, alignmentArray2.columnSize));
+            optimalSolutionsNumber = CountNumberOfOptimalSolutions(iterator);
+            return optimalSolutionsNumber;
         }
 
-        private void CountNumberOfOptimalSolutions(int i, int j, ref int sum)
+        private int CountNumberOfOptimalSolutions(ArrayIterator iterator)
         {
-
-            if (i == 0 && j == 0)
+            int optimalSolutionsNumber = 0;
+            Cell cell = (Cell)iterator.GetCurrentCell();
+            if (cell.IsTopLeftCell())
             {
-                ++sum;
-                return;
+                return 1;
             }
-            if (i > 0 && j > 0 && alignmentArray[i, j] == alignmentArray[i - 1, j - 1] + parameters.CostArray.GetLettersAlignmentCost(parameters.Sequences[0].Value[i - 1], parameters.Sequences[1].Value[j - 1]))
+            int i = cell.rowIndex;
+            int j = cell.columnIndex;
+            int costOfCurrentCell = cell.value;
+
+            if (iterator.HasDiagonal())
             {
-                CountNumberOfOptimalSolutions(i - 1, j - 1, ref sum);
+                int costDiag = ComputeCostOfMatchingSigns(cell.GetUpDiagonalNeighbor());
+                if (costOfCurrentCell.Equals(costDiag))
+                {
+                    ArrayIterator diagIterator = alignmentArray2.GetIterator();
+                    diagIterator.SetToCell(cell);
+                    diagIterator.Diagonal();
+                    optimalSolutionsNumber += CountNumberOfOptimalSolutions(diagIterator);
+                }
             }
 
+            ArrayIterator upIterator = alignmentArray2.GetIterator();
+            ArrayIterator leftIterator = alignmentArray2.GetIterator();
+            upIterator.SetToCell(cell);
+            leftIterator.SetToCell(cell);
             int k = 1;
             while (true)
             {
-                if (i >= k && alignmentArray[i, j] == alignmentArray[i - k, j] + parameters.CostArray.GapCostFun(k))
+  
+                ComputeCostOfHavingNGaps(k, cell);
+                if (upIterator.HasUp())
                 {
-                    CountNumberOfOptimalSolutions(i - k, j, ref sum);
-                    //break;
+                    upIterator.Up();
+                    Cell currentCell = (Cell)upIterator.GetCurrentCell();
+
+                    if (costOfCurrentCell.Equals(verticalGapsCost))
+                    {      
+                        optimalSolutionsNumber += CountNumberOfOptimalSolutions(upIterator);
+                    }
                 }
-                if (j >= k && alignmentArray[i, j] == alignmentArray[i, j - k] + parameters.CostArray.GapCostFun(k))
+
+                if (leftIterator.HasLeft())
                 {
-                    CountNumberOfOptimalSolutions(i,j - k, ref sum);
-                    //break;
+                    leftIterator.Left();
+                    Cell currentCell = (Cell)leftIterator.GetCurrentCell();
+
+                    if (costOfCurrentCell.Equals(horizontalGapsCost))
+                    {
+                        optimalSolutionsNumber += CountNumberOfOptimalSolutions(leftIterator);
+                    }
                 }
+
                 ++k;
                 if (k > i && k > j) break;
             }
+            return optimalSolutionsNumber;
         }
 
     }

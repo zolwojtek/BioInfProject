@@ -6,22 +6,10 @@ using System.Threading.Tasks;
 
 namespace StringAlgorithms
 {
-    //Multiple Sequence Alignment
     public class MultipleAlignmentExact : TextAlignmentAlgorithm
     {
         private new int[, ,] alignmentArray;
-        //public TextAlignmentParameters Parameters
-        //{
-        //    get
-        //    {
-        //        return parameters;
-        //    }
-        //    set
-        //    {
-        //        parameters = value;
-        //        alignmentArray = null;
-        //    }
-        //}
+
 
 
         public MultipleAlignmentExact(TextAlignmentParameters parameters) : base(parameters)
@@ -29,19 +17,41 @@ namespace StringAlgorithms
 
         }
 
-        protected override void ComputeAlignmentArray()
+        public override Alignment GetOptimalAlignment()
+        {
+            ComputeAlignmentArrayIfNecessary();
+            return GetAligment();
+        }
+
+        private void ComputeAlignmentArrayIfNecessary()
+        {
+            if (this.alignmentArray == null)
+            {
+                InitializeAlignmentArray();
+                ComputeAlignmentArray();
+            }
+        }
+
+        private void InitializeAlignmentArray()
         {
             int i = parameters.Sequences[0].Value.Length;
             int j = parameters.Sequences[1].Value.Length;
             int k = parameters.Sequences[2].Value.Length;
             this.alignmentArray = new int[i + 1, j + 1, k + 1];
+        }
 
+        protected override void ComputeAlignmentArray()
+        {
+
+            int i = parameters.Sequences[0].Value.Length;
+            int j = parameters.Sequences[1].Value.Length;
+            int k = parameters.Sequences[2].Value.Length;
             string A = parameters.Sequences[0].Value;
             string B = parameters.Sequences[1].Value;
             string C = parameters.Sequences[2].Value;
 
             
-            List<int>[] v = variancy(3);
+            List<int>[] directionsInCube = Variancy(3);
             
             for (int it = 0; it <= i; ++it)
             {
@@ -50,7 +60,7 @@ namespace StringAlgorithms
                     for (int kt = 0; kt <= k; ++kt)
                     {
                         List<int> variables = new List<int>();
-                        foreach (List<int> list in v)
+                        foreach (List<int> list in directionsInCube)
                         {
                             variables.Add(ComputeCell(it, jt, kt, list[0], list[1], list[2]));
                         }
@@ -62,6 +72,22 @@ namespace StringAlgorithms
                     }
                 }
             }
+        }
+
+        private int ComputeCell(int i, int j, int k, int iOffset, int jOffset, int kOffset)
+        {
+            if (i - iOffset >= 0 && j - jOffset >= 0 && k - kOffset >= 0)
+            {
+                string A = parameters.Sequences[0].Value;
+                string B = parameters.Sequences[1].Value;
+                string C = parameters.Sequences[2].Value;
+                char a, b, c;
+                a = FetchSign(A, i, iOffset);
+                b = FetchSign(B, j, jOffset);
+                c = FetchSign(C, k, kOffset);
+                return alignmentArray[i - iOffset, j - jOffset, k - kOffset] + ComputeAligningValue(a, b, c);
+            }
+            return int.MaxValue - 1000;
         }
 
 
@@ -94,27 +120,9 @@ namespace StringAlgorithms
             return seq[i - iOffset];
         }
 
-        private int ComputeCell(int i, int j, int k, int iOffset, int jOffset, int kOffset)
-        {
-            if (i - iOffset >= 0 && j - jOffset >= 0 && k - kOffset >= 0)
-            {
-                string A = parameters.Sequences[0].Value;
-                string B = parameters.Sequences[1].Value;
-                string C = parameters.Sequences[2].Value;
-                char a, b, c;
-                a = FetchSign(A, i, iOffset);
-                b = FetchSign(B, j, jOffset);
-                c = FetchSign(C, k, kOffset);
-                return alignmentArray[i - iOffset, j - jOffset, k - kOffset] + ComputeAligningValue(a, b, c);
-            }
-            return int.MaxValue - 1000;
-        }
 
-        public override Alignment GetOptimalAlignment()
-        {
-            ComputeSolutionIfNecessary();
-            return GetAligment();
-        }
+
+
 
         private Alignment GetAligment()
         {
@@ -211,7 +219,7 @@ namespace StringAlgorithms
 
         public override int GetOptimalAlignmentScore()
         {
-            ComputeSolutionIfNecessary();
+            ComputeAlignmentArrayIfNecessary();
             int i = parameters.Sequences[0].Value.Length;
             int j = parameters.Sequences[1].Value.Length;
             int k = parameters.Sequences[2].Value.Length;
@@ -229,7 +237,7 @@ namespace StringAlgorithms
             return i;
         }
 
-        public List<int>[] variancy(int k)
+        public List<int>[] Variancy(int k)
         {
             int i;
             int[] skok = new int[k + 1];
@@ -279,7 +287,7 @@ namespace StringAlgorithms
 
         public override int GetNumberOfOptimalSolutions()
         {
-            ComputeSolutionIfNecessary();
+            ComputeAlignmentArrayIfNecessary();
             int i = parameters.Sequences[0].Value.Length;
             int j = parameters.Sequences[1].Value.Length;
             int k = parameters.Sequences[2].Value.Length;
@@ -296,7 +304,7 @@ namespace StringAlgorithms
                 ++sum;
                 return;
             }
-            List<int>[] possibleDirections = variancy(3);
+            List<int>[] possibleDirections = Variancy(3);
             foreach (List<int> list in possibleDirections)
             {
                 if (alignmentArray[i, j, k] == ComputeCell(i, j, k, list[0], list[1], list[2]))
@@ -307,13 +315,7 @@ namespace StringAlgorithms
         }
 
 
-        private void ComputeSolutionIfNecessary()
-        {
-            if (this.alignmentArray == null)
-            {
-                ComputeAlignmentArray();
-            }
-        }
+        
 
     }
 }
