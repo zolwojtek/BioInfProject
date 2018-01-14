@@ -10,7 +10,7 @@ namespace StringAlgorithms.Utils
     {
 
         object GetCurrentCell();
-        void SetToCell(Cell cell);
+        void SetToCell(Cube cell);
 
         bool HasNext();
         bool HasPrevious();

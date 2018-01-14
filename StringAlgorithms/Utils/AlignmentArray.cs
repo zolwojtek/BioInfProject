@@ -13,22 +13,9 @@ namespace StringAlgorithms.Utils
         public int rowSize;
         public int columnSize;
 
-
         public AlignmentArray()
         {
             
-        }
-
-        private bool IsInitialized()
-        {
-            if(array == null)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
         }
 
         public ArrayIterator GetIterator()
@@ -40,19 +27,27 @@ namespace StringAlgorithms.Utils
             return new AlignmentArrayIterator(this);
         }
 
-        public void Initialize(int rowSize, int columnSize, ValueFun fun)
+        private bool IsInitialized()
         {
-            array = new int[rowSize + 1, columnSize + 1];
-            FillFirstRowAndColumnWithInitialValues(fun);
-            this.rowSize = rowSize;
-            this.columnSize = columnSize;    
+            if (array == null)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
 
-        public void Initialize(int rowSize, int columnSize)
+        public void Initialize(int lastRowIndex, int lastColumnIndex, ValueFun rowValueFun, ValueFun columnValueFun)
         {
-            array = new int[rowSize + 1, columnSize + 1];
-            this.rowSize = rowSize;
-            this.columnSize = columnSize;
+            //because of index 0
+            array = new int[lastRowIndex+1, lastColumnIndex+1];
+
+            array.FillRowWithIntValue(0, rowValueFun);
+            array.FillColumnWithIntValue(0, columnValueFun);
+            this.rowSize = lastRowIndex;
+            this.columnSize = lastColumnIndex;    
         }
 
         public void Initialize(int[,] matrix)
@@ -60,12 +55,6 @@ namespace StringAlgorithms.Utils
             array = matrix;          
             this.rowSize = matrix.GetLength(0) - 1;
             this.columnSize = matrix.GetLength(1) - 1;
-        }
-
-        private void FillFirstRowAndColumnWithInitialValues(ValueFun fun)
-        {
-            array.FillColumnWithIntValue(0, fun);
-            array.FillRowWithIntValue(0, fun);
         }
 
         public int GetCellNumber(int row, int column)
@@ -87,37 +76,33 @@ namespace StringAlgorithms.Utils
             return (rowSize) * (columnSize);
         }
 
-        public void SetCell(Cell cell)
+        public void SetCell(Cube cell)
         {
             array[cell.rowIndex, cell.columnIndex] = cell.value;
         }
 
-        public Cell GetCell(int row, int column)
+        public Cube GetCell(int row, int column)
         {
-            Cell cell = new Cell(row, column, array[row, column]);
+            Cube cell = new Cube(row, column,0, array[row, column]);
             return cell;
         }
 
-        public void FillRowWithValue(int row, ValueFun fun)
+        public int GetCellValue(int row, int column)
         {
-            array.FillRowWithIntValue(0, fun);
+            return array[row, column];
         }
 
-        public void FillColumnWithValue(int column, ValueFun fun)
-        {
-            array.FillColumnWithIntValue(0, fun);
-        }
     }
 
     internal class AlignmentArrayIterator : ArrayIterator
     {
         AlignmentArray alignmentArray;
-        Cell activeCell;
+        Cube activeCell;
 
         public AlignmentArrayIterator(AlignmentArray array)
         {
             this.alignmentArray = array;
-            activeCell = new Cell(1, 0, 0);
+            activeCell = new Cube(1, 0, 0,0);
         }
 
         public object GetCurrentCell()
@@ -125,9 +110,9 @@ namespace StringAlgorithms.Utils
             return activeCell;
         }
 
-        public void SetToCell(Cell cell)
+        public void SetToCell(Cube cell)
         {
-            cell.value = alignmentArray.GetCell(alignmentArray.rowSize, alignmentArray.columnSize).value;
+            cell.value = alignmentArray.GetCellValue(cell.rowIndex, cell.columnIndex);
             activeCell = cell;
         }
 

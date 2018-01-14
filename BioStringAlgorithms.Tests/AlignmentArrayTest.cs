@@ -24,7 +24,7 @@ namespace BioStringAlgorithms.Tests
             
             while(arrayIterator.HasNext())
             {
-                Cell returnedCell = (Cell)arrayIterator.Next();
+                Cube returnedCell = (Cube)arrayIterator.Next();
                 returnedValues.Add(returnedCell.value);
             }
 
@@ -135,8 +135,8 @@ namespace BioStringAlgorithms.Tests
             alignmentArray.Initialize(fakeArray);
 
             ArrayIterator iterator = alignmentArray.GetIterator();
-            iterator.SetToCell(new Cell(alignmentArray.rowSize, alignmentArray.columnSize));
-            Cell cell = (Cell)iterator.Up();
+            iterator.SetToCell(new Cube(alignmentArray.rowSize, alignmentArray.columnSize,0));
+            Cube cell = (Cube)iterator.Up();
             
 
             Assert.That(cell.rowIndex, Is.EqualTo(1));

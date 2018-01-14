@@ -29,23 +29,23 @@ namespace StringAlgorithms
             return matrix;
         }
 
-        public static int[,] SetCell(this int[,] matrix, Cell cell, int value)
+        public static int[,] SetCell(this int[,] matrix, Cube cell, int value)
         {
             matrix[cell.rowIndex, cell.columnIndex] = value;
             return matrix;
         }
 
-        public static int GetCellValue(this int[,] matrix, Cell cell)
-        {
-            int value = matrix[cell.rowIndex, cell.columnIndex];
-            return value;
-        }
+        //public static int GetCellValue(this int[,] matrix, Cell cell)
+        //{
+        //    int value = matrix[cell.rowIndex, cell.columnIndex];
+        //    return value;
+        //}
 
-        public static Cell GetCell(this int[,] matrix, int row, int column)
-        {
-            int cellValue = matrix[row, column];
-            Cell cell = new Cell(row, column,cellValue);
-            return cell;
-        }
+        //public static Cell GetCell(this int[,] matrix, int row, int column)
+        //{
+        //    int cellValue = matrix[row, column];
+        //    Cell cell = new Cell(row, column,cellValue);
+        //    return cell;
+        //}
     }
 }

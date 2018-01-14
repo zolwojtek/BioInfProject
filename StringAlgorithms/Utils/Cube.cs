@@ -6,32 +6,33 @@ using System.Threading.Tasks;
 
 namespace StringAlgorithms.Utils
 {
-    public struct Cell
+    public struct Cube
     {
-        public int rowIndex, columnIndex;
+        public int rowIndex, columnIndex, depthIndex;
         public int value;
 
-        public Cell(int rowIndex, int columnIndex, int value = 0)
+        public Cube(int rowIndex, int columnIndex, int depthIndex, int value=0)
         {
             this.rowIndex = rowIndex;
             this.columnIndex = columnIndex;
+            this.depthIndex = depthIndex;
             this.value = value;
 
         }
 
-        public Cell GetUpNeighbor()
+        public Cube GetUpNeighbor()
         {
-            return new Cell(rowIndex - 1, columnIndex);
+            return new Cube(rowIndex - 1, columnIndex, 0);
         }
 
-        public Cell GetUpDiagonalNeighbor()
+        public Cube GetUpDiagonalNeighbor()
         {
-            return new Cell(rowIndex - 1, columnIndex - 1);
+            return new Cube(rowIndex - 1, columnIndex - 1,0);
         }
 
-        public Cell GetLeftNeighbor()
+        public Cube GetLeftNeighbor()
         {
-            return new Cell(rowIndex, columnIndex - 1);
+            return new Cube(rowIndex, columnIndex - 1,0);
         }
 
         public bool IsTopLeftCell()
