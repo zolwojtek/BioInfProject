@@ -13,13 +13,13 @@ namespace BioStringAlgorithms.Tests
         [Test]
         public void GetIterator_GetAllElements_ReturnsElementsRowByRow()
         {
-            int[,] fakeArray = new int[,] { { 0, 0, 0, 0 }, { 0, 1, 2, 3 }, { 0, 4, 5, 6 }, { 0, 7, 8, 9 } };
+            int[,,] fakeArray = new int[,,] { { { 0 }, { 0 }, { 0 }, { 0 } }, { { 0 }, { 1 }, { 2 }, { 3 } }, { { 0 }, { 4 }, { 5 }, { 6 } }, { { 0 }, { 7 }, { 8 }, { 9 } } };
             List<int> returnedValues = new List<int>();
             List<int> correctValues = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-            AlignmentArray alignmentArray = new AlignmentArray();
+            AlignmentCube alignmentArray = new AlignmentCube();
             alignmentArray.Initialize(fakeArray);
 
-            ArrayIterator arrayIterator = alignmentArray.GetIterator();
+            CubeIterator arrayIterator = alignmentArray.GetIterator();
 
             
             while(arrayIterator.HasNext())
@@ -35,9 +35,9 @@ namespace BioStringAlgorithms.Tests
         [Test]
         public void GetNumberOfCells_2x4matrix_correctNumber()
         {
-            int[,] fakeArray = new int[,] { { 0, 0, 0, 0, 0 }, { 0, 1, 2, 3, 4 }, { 0, 5, 6, 7, 8 } };
+            int[,,] fakeArray = new int[,,] {  { {0}, { 0 }, { 0 }, { 0 }, { 0 } }, { { 0 }, { 1 }, { 2 }, { 3 }, { 4 } }, { { 0 }, { 5 }, { 6 }, { 7 }, { 8 } } };
 
-            AlignmentArray alignmentArray = new AlignmentArray();
+            AlignmentCube alignmentArray = new AlignmentCube();
             alignmentArray.Initialize(fakeArray);
 
             int numberOfCells = alignmentArray.GetNumberOfCells();
@@ -48,9 +48,9 @@ namespace BioStringAlgorithms.Tests
         [Test]
         public void GetCellNumber_firstCell_correctNumber()
         {
-            int[,] fakeArray = new int[,] { { 0, 0, 0, 0, 0 }, { 0, 1, 2, 3, 4 }, { 0, 5, 6, 7, 8 } };
+            int[,,] fakeArray = new int[,,] { { { 0 }, { 0 }, { 0 }, { 0 }, { 0 } }, { { 0 }, { 1 }, { 2 }, { 3 }, { 4 } }, { { 0 }, { 5 }, { 6 }, { 7 }, { 8 } } };
 
-            AlignmentArray alignmentArray = new AlignmentArray();
+            AlignmentCube alignmentArray = new AlignmentCube();
             alignmentArray.Initialize(fakeArray);
 
             int cellNumber = alignmentArray.GetCellNumber(1, 1);
@@ -61,9 +61,9 @@ namespace BioStringAlgorithms.Tests
         [Test]
         public void GetCellNumber_lastCell_correctNumber()
         {
-            int[,] fakeArray = new int[,] { { 0, 0, 0, 0, 0 }, { 0, 1, 2, 3, 4 }, { 0, 5, 6, 7, 8 } };
+            int[,,] fakeArray = new int[,,] { { { 0 }, { 0 }, { 0 }, { 0 }, { 0 } }, { { 0 }, { 1 }, { 2 }, { 3 }, { 4 } }, { { 0 }, { 5 }, { 6 }, { 7 }, { 8 } } };
 
-            AlignmentArray alignmentArray = new AlignmentArray();
+            AlignmentCube alignmentArray = new AlignmentCube();
             alignmentArray.Initialize(fakeArray);
 
             int cellNumber = alignmentArray.GetCellNumber(2, 4);
@@ -76,11 +76,11 @@ namespace BioStringAlgorithms.Tests
         [Test]
         public void GetIterator_GetNextElementWhenEmpty_Throws()
         {
-            int[,] fakeArray = new int[,] { { 0, 0 }, { 0, 0 } };
-            AlignmentArray alignmentArray = new AlignmentArray();
+            int[,,] fakeArray = new int[,,] { { { 0 }, { 0 } }, { { 0 }, { 0 } }  };
+            AlignmentCube alignmentArray = new AlignmentCube();
             alignmentArray.Initialize(fakeArray);
 
-            ArrayIterator iterator = alignmentArray.GetIterator();
+            CubeIterator iterator = alignmentArray.GetIterator();
             iterator.Next();
 
             var ex = Assert.Throws<InvalidOperationException>(() => iterator.Next());
@@ -90,7 +90,7 @@ namespace BioStringAlgorithms.Tests
         [Test]
         public void GetIterator_GetIteratorWhenNotInitialized_Throws()
         {
-            AlignmentArray alignmentArray = new AlignmentArray();
+            AlignmentCube alignmentArray = new AlignmentCube();
 
             var ex = Assert.Throws<InvalidOperationException>(() => alignmentArray.GetIterator());
             StringAssert.Contains("not been inicialized", ex.Message);
@@ -101,11 +101,11 @@ namespace BioStringAlgorithms.Tests
         [Test]
         public void GetIterator_GetPreviousElementWhenEmpty_Throws()
         {
-            int[,] fakeArray = new int[,] { { 0, 0 }, { 0, 0 } };
-            AlignmentArray alignmentArray = new AlignmentArray();
+            int[,,] fakeArray = new int[,,] { { { 0 }, { 0 } }, { { 0 }, { 0 } } };
+            AlignmentCube alignmentArray = new AlignmentCube();
             alignmentArray.Initialize(fakeArray);
 
-            ArrayIterator iterator = alignmentArray.GetIterator();
+            CubeIterator iterator = alignmentArray.GetIterator();
             iterator.Next();
 
             var ex = Assert.Throws<InvalidOperationException>(() => iterator.Previous());
@@ -115,11 +115,11 @@ namespace BioStringAlgorithms.Tests
         [Test]
         public void GetIterator_GetUpElementWhenEmpty_Throws()
         {
-            int[,] fakeArray = new int[,] { { 0, 0 }, { 0, 0 } };
-            AlignmentArray alignmentArray = new AlignmentArray();
+            int[,,] fakeArray = new int[,,] { { { 0 }, { 0 } }, { { 0 }, { 0 } } };
+            AlignmentCube alignmentArray = new AlignmentCube();
             alignmentArray.Initialize(fakeArray);
 
-            ArrayIterator iterator = alignmentArray.GetIterator();
+            CubeIterator iterator = alignmentArray.GetIterator();
             iterator.Up();
 
             var ex = Assert.Throws<InvalidOperationException>(() => iterator.Up());
@@ -129,12 +129,12 @@ namespace BioStringAlgorithms.Tests
         [Test]
         public void GetIterator_GetLegalUpElement_correctCell()
         {
-            int[,] fakeArray = new int[,] { { 0, 0, 0, 0, 0 }, { 0, 1, 2, 3, 4 }, { 0, 5, 6, 7, 8 } };
+            int[,,] fakeArray = new int[,,] { { { 0 }, { 0 }, { 0 }, { 0 }, { 0 } }, { { 0 }, { 1 }, { 2 }, { 3 }, { 4 } }, { { 0 }, { 5 }, { 6 }, { 7 }, { 8 } } };
 
-            AlignmentArray alignmentArray = new AlignmentArray();
+            AlignmentCube alignmentArray = new AlignmentCube();
             alignmentArray.Initialize(fakeArray);
 
-            ArrayIterator iterator = alignmentArray.GetIterator();
+            CubeIterator iterator = alignmentArray.GetIterator();
             iterator.SetToCell(new Cube(alignmentArray.rowSize, alignmentArray.columnSize,0));
             Cube cell = (Cube)iterator.Up();
             

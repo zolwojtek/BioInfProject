@@ -19,7 +19,7 @@ namespace StringAlgorithms
         private Alignment computedAlignment = null;
         private StringBuilder firstSeqenceOfAlignment = null;
         private StringBuilder secondSequenceOfAlignment = null;
-        private AlignmentArray array;
+        private AlignmentCube array;
 
         public GlobalAlignment(TextAlignmentParameters parameters): base(parameters)
         {
@@ -47,13 +47,13 @@ namespace StringAlgorithms
             int alignmentArrayRowNumber = parameters.Sequences[0].Value.Length;
             int alignmentArrayColumnNumber = parameters.Sequences[1].Value.Length;
 
-            array = new AlignmentArray();
-            array.Initialize(alignmentArrayRowNumber, alignmentArrayColumnNumber, (x) => (parameters.CostArray.GapCostFun(x)), (x) => (parameters.CostArray.GapCostFun(x)));
+            array = new AlignmentCube();
+            array.Initialize(alignmentArrayRowNumber, alignmentArrayColumnNumber,0, (x) => (parameters.CostArray.GapCostFun(x)), (x) => (parameters.CostArray.GapCostFun(x)));
         }
 
         protected override void ComputeAlignmentArray()
         {
-            ArrayIterator alignmentArrayIterator = array.GetIterator();
+            CubeIterator alignmentArrayIterator = array.GetIterator();
             while (alignmentArrayIterator.HasNext())
             {
                 Cube currentCell = (Cube)alignmentArrayIterator.Next();
@@ -114,7 +114,7 @@ namespace StringAlgorithms
 
         private void RetrieveAlignment()
         {       
-            ArrayIterator iterator = array.GetIterator();
+            CubeIterator iterator = array.GetIterator();
             iterator.SetToCell(new Cube(array.rowSize, array.columnSize,0));
             Cube currentCell = (Cube)iterator.GetCurrentCell();
 
@@ -131,7 +131,7 @@ namespace StringAlgorithms
             computedAlignment = new Alignment(firstAlignmentSeq, secondAlignmentSeq);
         }
 
-        private Cube GoOneStepBack(Cube from, ArrayIterator iterator)
+        private Cube GoOneStepBack(Cube from, CubeIterator iterator)
         {
             Cube newCell = new Cube();
 
@@ -220,13 +220,13 @@ namespace StringAlgorithms
         {
             ComputeAlignmentArrayIfNecessary();
             int optimalSolutionsNumber = 0;
-            ArrayIterator iterator = array.GetIterator();
+            CubeIterator iterator = array.GetIterator();
             iterator.SetToCell(new Cube(array.rowSize, array.columnSize,0));
             optimalSolutionsNumber = CountNumberOfOptimalSolutions(iterator);
             return optimalSolutionsNumber;
         }
 
-        private int CountNumberOfOptimalSolutions(ArrayIterator iterator)
+        private int CountNumberOfOptimalSolutions(CubeIterator iterator)
         {
             int optimalSolutionsNumber = 0;
             Cube cell = (Cube)iterator.GetCurrentCell();
@@ -242,7 +242,7 @@ namespace StringAlgorithms
                 ComputeGoingFromNeighborsCosts(cell);
                 if (costOfCurrentCell.Equals(fromDiagonalNeighborCost))
                 {
-                    ArrayIterator diagIterator = array.GetIterator();
+                    CubeIterator diagIterator = array.GetIterator();
                     diagIterator.SetToCell(cell);
                     diagIterator.Diagonal();
                     optimalSolutionsNumber += CountNumberOfOptimalSolutions(diagIterator);
@@ -253,7 +253,7 @@ namespace StringAlgorithms
                 ComputeGoingFromNeighborsCosts(cell);
                 if (costOfCurrentCell.Equals(fromUpNeighborCost))
                 {
-                    ArrayIterator upIterator = array.GetIterator();
+                    CubeIterator upIterator = array.GetIterator();
                     upIterator.SetToCell(cell);
                     upIterator.Up();
                     optimalSolutionsNumber += CountNumberOfOptimalSolutions(upIterator);
@@ -264,7 +264,7 @@ namespace StringAlgorithms
                 ComputeGoingFromNeighborsCosts(cell);
                 if (costOfCurrentCell.Equals(fromLeftNeighborCost))
                 {
-                    ArrayIterator leftIterator = array.GetIterator();
+                    CubeIterator leftIterator = array.GetIterator();
                     leftIterator.SetToCell(cell);
                     leftIterator.Left();
                     optimalSolutionsNumber += CountNumberOfOptimalSolutions(leftIterator);

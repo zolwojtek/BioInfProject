@@ -85,11 +85,10 @@
     <Compile Include="Enums\Directions.cs" />
     <Compile Include="Enums\FunctionTypeEnum.cs" />
     <Compile Include="Utils\Alignment.cs" />
-    <Compile Include="Utils\AlignmentArray.cs" />
     <Compile Include="Utils\AlignmentCube.cs" />
     <Compile Include="Utils\Cube.cs" />
     <Compile Include="Utils\Constants.cs" />
-    <Compile Include="Utils\ArrayIterator.cs" />
+    <Compile Include="Utils\CubeIterator.cs" />
     <Compile Include="Utils\MatrixExtensions.cs" />
     <Compile Include="Utils\ObjectExtension.cs" />
     <Compile Include="Utils\LetterAlignmentCostManager.cs" />

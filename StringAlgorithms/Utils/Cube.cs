@@ -11,7 +11,7 @@ namespace StringAlgorithms.Utils
         public int rowIndex, columnIndex, depthIndex;
         public int value;
 
-        public Cube(int rowIndex, int columnIndex, int depthIndex, int value=0)
+        public Cube(int rowIndex, int columnIndex, int depthIndex, int value = 0)
         {
             this.rowIndex = rowIndex;
             this.columnIndex = columnIndex;

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace StringAlgorithms.Utils
 {
-    public interface ArrayIterator
+    public interface CubeIterator
     {
 
         object GetCurrentCell();
@@ -27,8 +27,8 @@ namespace StringAlgorithms.Utils
         object Diagonal();
     }
 
-    public interface ArrayIterable
+    public interface CubeIterable
     {
-        ArrayIterator GetIterator();
+        CubeIterator GetIterator();
     }
 }
