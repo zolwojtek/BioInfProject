@@ -15,13 +15,13 @@ namespace BioStringAlgorithms.Tests
         {
             int[,,] fakeArray = new int[,,] { { { 0 }, { 0 }, { 0 }, { 0 } }, { { 0 }, { 1 }, { 2 }, { 3 } }, { { 0 }, { 4 }, { 5 }, { 6 } }, { { 0 }, { 7 }, { 8 }, { 9 } } };
             List<int> returnedValues = new List<int>();
-            List<int> correctValues = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+            List<int> correctValues = new List<int>() { 0, 0, 0, 0, 0, 1, 2, 3, 0, 4, 5, 6, 0, 7, 8, 9 };
             AlignmentCube alignmentArray = new AlignmentCube();
             alignmentArray.Initialize(fakeArray);
 
             CubeIterator arrayIterator = alignmentArray.GetIterator();
 
-            
+            returnedValues.Add(((Cube)arrayIterator.GetCurrentCell()).value);
             while(arrayIterator.HasNext())
             {
                 Cube returnedCell = (Cube)arrayIterator.Next();
@@ -81,7 +81,7 @@ namespace BioStringAlgorithms.Tests
             alignmentArray.Initialize(fakeArray);
 
             CubeIterator iterator = alignmentArray.GetIterator();
-            iterator.Next();
+            iterator.SetToCell(new Cube(1, 1, 0));
 
             var ex = Assert.Throws<InvalidOperationException>(() => iterator.Next());
             StringAssert.Contains("no more elements", ex.Message);
@@ -120,7 +120,7 @@ namespace BioStringAlgorithms.Tests
             alignmentArray.Initialize(fakeArray);
 
             CubeIterator iterator = alignmentArray.GetIterator();
-            iterator.Up();
+            
 
             var ex = Assert.Throws<InvalidOperationException>(() => iterator.Up());
             StringAssert.Contains("no more elements", ex.Message);

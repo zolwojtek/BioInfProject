@@ -42,8 +42,7 @@ namespace StringAlgorithms.Utils
 
         public void Initialize(int lastRowIndex, int lastColumnIndex, int lastDepthIndex, ValueFun rowValueFun, ValueFun columnValueFun)
         {
-            //because of index 0
-
+            //+1 because of index 0
             array = new int[lastRowIndex + 1, lastColumnIndex + 1, lastDepthIndex + 1];
             array.FillRowWithIntValue(0, 0, rowValueFun);
             array.FillColumnWithIntValue(0, 0, columnValueFun);
@@ -77,7 +76,8 @@ namespace StringAlgorithms.Utils
             {
                 throw new InvalidOperationException("Object has not been inicialized!");
             }
-            return (rowSize) * (columnSize);
+            
+            return (rowSize) * (columnSize) * ((depthSize==0)?1:depthSize);
         }
 
         public void SetCell(Cube cell)
@@ -106,7 +106,7 @@ namespace StringAlgorithms.Utils
         public AlignmentCubeIterator(AlignmentCube array)
         {
             this.alignmentArray = array;
-            activeCell = new Cube(1, 0, 0, 0);
+            activeCell = new Cube(0, 0, 0, 0);
         }
 
         public object GetCurrentCell()
@@ -122,9 +122,11 @@ namespace StringAlgorithms.Utils
 
         public bool HasNext()
         {
-            int numberOfCells = alignmentArray.GetNumberOfCells();
-            int currentCellNumber = alignmentArray.GetCellNumber(activeCell.rowIndex, activeCell.columnIndex);
-            if(currentCellNumber < numberOfCells)
+            //int numberOfCells = alignmentArray.GetNumberOfCells();
+            //int currentCellNumber = alignmentArray.GetCellNumber(activeCell.rowIndex, activeCell.columnIndex);
+
+            //Może porówać z Cube new Cube(alignmentArray.rowSize, alignmentArray.ColumnSize, alignmentArray.DepthSize)?
+            if(activeCell.rowIndex < alignmentArray.rowSize || activeCell.columnIndex < alignmentArray.columnSize || activeCell.depthIndex < alignmentArray.depthSize)
             {
                 return true;
             }
@@ -146,10 +148,16 @@ namespace StringAlgorithms.Utils
                 if(activeColumn > alignmentArray.columnSize)
                 {
                     activeRow++;
-                    activeColumn = 1;
+                    activeColumn = 0;
+                }
+                if(activeRow > alignmentArray.rowSize)
+                {
+                    activeDepth++;
+                    activeRow = 0;
                 }
                 activeCell.rowIndex = activeRow;
                 activeCell.columnIndex = activeColumn;
+                activeCell.depthIndex = activeDepth;
                 activeCell.value = alignmentArray.array[activeRow, activeColumn, activeDepth];
                 return activeCell;
             }

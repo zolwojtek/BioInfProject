@@ -52,9 +52,9 @@ namespace StringAlgorithms
             helpArrayP = new AlignmentCube();
             helpArrayQ = new AlignmentCube();
 
-            alignmentArray2.Initialize(alignmentArrayRowNumber, alignmentArrayColumnNumber,0, (x) => (parameters.CostArray.GapCostFun(x)), (x) => (parameters.CostArray.GapCostFun(x)));
-            helpArrayP.Initialize(alignmentArrayRowNumber, alignmentArrayColumnNumber,0, (x) => (int.MaxValue / 2),(x) => 0);
-            helpArrayQ.Initialize(alignmentArrayRowNumber, alignmentArrayColumnNumber,0,(x) => 0, (x) => (int.MaxValue / 2));
+            alignmentArray2.Initialize(alignmentArrayRowNumber, alignmentArrayColumnNumber,0, (x) => 0, (x) => 0);
+            helpArrayP.Initialize(alignmentArrayRowNumber, alignmentArrayColumnNumber,0, (x) => 0,(x) => 0);
+            helpArrayQ.Initialize(alignmentArrayRowNumber, alignmentArrayColumnNumber,0,(x) => 0, (x) => 0);
         }
 
         protected override void ComputeAlignmentArray()
@@ -63,7 +63,50 @@ namespace StringAlgorithms
             while (alignmentArrayIterator.HasNext())
             {
                 Cube currentCell = (Cube)alignmentArrayIterator.Next();
-                ComputeCell(currentCell);
+                if (IsBorderCell(currentCell) == false)
+                {
+                    ComputeCell(currentCell);
+                }
+                else
+                {
+                    ComputeBorderCell(currentCell);
+                }
+            }
+        }
+
+        private void ComputeBorderCell(Cube cell)
+        {
+            int gapCost = 0;
+            Cube cellP = new Cube();
+            Cube cellQ = new Cube();
+
+            if (cell.rowIndex == 0)
+            {
+                gapCost = parameters.CostArray.GapCostFun(cell.columnIndex);
+                cellP = new Cube(cell.rowIndex, cell.columnIndex, 0, int.MaxValue / 2);
+                cellQ = new Cube(cell.rowIndex, cell.columnIndex, 0, 0);
+            }
+            else if (cell.columnIndex == 0)
+            {
+                gapCost = parameters.CostArray.GapCostFun(cell.rowIndex);
+                cellP = new Cube(cell.rowIndex, cell.columnIndex, 0, 0);
+                cellQ = new Cube(cell.rowIndex, cell.columnIndex, 0, int.MaxValue / 2);
+            }
+            cell.value = gapCost;
+            alignmentArray2.SetCell(cell);
+            helpArrayP.SetCell(cellP);
+            helpArrayQ.SetCell(cellQ);
+        }
+
+        private bool IsBorderCell(Cube cell)
+        {
+            if (cell.rowIndex == 0 || cell.columnIndex == 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 

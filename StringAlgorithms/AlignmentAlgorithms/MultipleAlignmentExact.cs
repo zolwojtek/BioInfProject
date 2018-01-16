@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StringAlgorithms.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,7 @@ namespace StringAlgorithms
     public class MultipleAlignmentExact : TextAlignmentAlgorithm
     {
         private new int[, ,] alignmentArray;
-
+        private AlignmentCube alignmentCube = null;
 
 
         public MultipleAlignmentExact(TextAlignmentParameters parameters) : base(parameters)
@@ -38,6 +39,31 @@ namespace StringAlgorithms
             int j = parameters.Sequences[1].Value.Length;
             int k = parameters.Sequences[2].Value.Length;
             this.alignmentArray = new int[i + 1, j + 1, k + 1];
+
+            alignmentCube = new AlignmentCube();
+            alignmentCube.Initialize(i, j, k, (x) => (parameters.CostArray.GapCostFun(x)), (x) => (parameters.CostArray.GapCostFun(x))); //powinno być to czy 0??!?!?! ValFun?
+
+            for (int it = 0; it <= i; ++it)
+            {
+                for (int jt = 0; jt <= j; ++jt)
+                {
+                    alignmentArray[it, jt, 0] = int.MaxValue / 2;
+                }
+            }
+            for (int it = 0; it <= i; ++it)
+            {
+                for (int kt = 0; kt <= k; ++kt)
+                {
+                    alignmentArray[it, 0, kt] = int.MaxValue / 2;
+                }
+            }
+            for (int kt = 0; kt <= k; ++kt)
+            {
+                for (int jt = 0; jt <= j; ++jt)
+                {
+                    alignmentArray[0, jt, kt] = int.MaxValue / 2;
+                }
+            }
         }
 
         protected override void ComputeAlignmentArray()
@@ -59,16 +85,16 @@ namespace StringAlgorithms
                 {
                     for (int kt = 0; kt <= k; ++kt)
                     {
-                        List<int> variables = new List<int>();
-                        foreach (List<int> list in directionsInCube)
+                        List<int> comingFromNeighborsCosts = new List<int>();
+                        foreach (List<int> directionVector in directionsInCube)
                         {
-                            variables.Add(ComputeCell(it, jt, kt, list[0], list[1], list[2]));
+                            comingFromNeighborsCosts.Add(ComputeCell(it, jt, kt, directionVector[0], directionVector[1], directionVector[2]));
                         }
                         if (it == 0 && jt == 0 && kt == 0)
                         {
-                            variables.Add(0);
+                            comingFromNeighborsCosts.Add(0);
                         }
-                        alignmentArray[it, jt, kt] = MinFromList(variables);
+                        alignmentArray[it, jt, kt] = MinFromList(comingFromNeighborsCosts);
                     }
                 }
             }
