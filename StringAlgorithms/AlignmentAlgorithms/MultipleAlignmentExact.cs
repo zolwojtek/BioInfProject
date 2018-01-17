@@ -85,20 +85,26 @@ namespace StringAlgorithms
             while (alignmentArrayIterator.HasNext())
             {
                 Cube currentCell = (Cube)alignmentArrayIterator.Next();
+
                 List<int> comingFromNeighborsCosts = new List<int>();
-                if (IsBorderCell(currentCell) == false)
+                foreach (List<int> directionVector in directionsInCube)
                 {
-                    foreach (List<int> directionVector in directionsInCube)
-                    {
-                        comingFromNeighborsCosts.Add(ComputeCell(currentCell.rowIndex, currentCell.columnIndex, currentCell.depthIndex, directionVector[0], directionVector[1], directionVector[2]));
-                    }   
+                    comingFromNeighborsCosts.Add(ComputeCell(currentCell.rowIndex, currentCell.columnIndex, currentCell.depthIndex, directionVector[0], directionVector[1], directionVector[2]));
                 }
-                else
+                if (currentCell.rowIndex == 0 && currentCell.columnIndex == 0 && currentCell.depthIndex == 0)
                 {
-                    //ComputeGapValue(currentCell);
-                    comingFromNeighborsCosts.Add(int.MaxValue / 2);
+                    comingFromNeighborsCosts.Add(0);
                 }
                 alignmentArray[currentCell.rowIndex, currentCell.columnIndex, currentCell.depthIndex] = MinFromList(comingFromNeighborsCosts);
+
+                //if (IsBorderCell(currentCell) == false)
+                //{
+                //    //ComputeCell(currentCell);
+                //}
+                //else
+                //{
+                //    //ComputeGapValue(currentCell);
+                //}
             }
 
         }
@@ -115,20 +121,7 @@ namespace StringAlgorithms
             }
         }
 
-        private void ComputeGapValue(Cube cell)
-        {
-            //int gapCost = 0;
-            //if (cell.rowIndex == 0)
-            //{
-            //    gapCost = parameters.CostArray.GapCostFun(cell.columnIndex);
-            //}
-            //else if (cell.columnIndex == 0)
-            //{
-            //    gapCost = parameters.CostArray.GapCostFun(cell.rowIndex);
-            //}
-            //cell.value = gapCost;
-            //array.SetCell(cell);
-        }
+
 
         private int ComputeCell(int i, int j, int k, int iOffset, int jOffset, int kOffset)
         {
