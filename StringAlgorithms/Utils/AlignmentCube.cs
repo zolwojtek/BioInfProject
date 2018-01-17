@@ -40,12 +40,10 @@ namespace StringAlgorithms.Utils
             }
         }
 
-        public void Initialize(int lastRowIndex, int lastColumnIndex, int lastDepthIndex, ValueFun rowValueFun, ValueFun columnValueFun)
+        public void Initialize(int lastRowIndex, int lastColumnIndex, int lastDepthIndex)
         {
             //+1 because of index 0
             array = new int[lastRowIndex + 1, lastColumnIndex + 1, lastDepthIndex + 1];
-            array.FillRowWithIntValue(0, 0, rowValueFun);
-            array.FillColumnWithIntValue(0, 0, columnValueFun);
 
             this.rowSize = lastRowIndex;
             this.columnSize = lastColumnIndex;
@@ -57,7 +55,7 @@ namespace StringAlgorithms.Utils
             array = matrix;          
             this.rowSize = matrix.GetLength(0) - 1;
             this.columnSize = matrix.GetLength(1) - 1;
-            this.depthSize = 0;
+            this.depthSize = matrix.GetLength(2) - 1;
         }
 
         public int GetCellNumber(int row, int column)

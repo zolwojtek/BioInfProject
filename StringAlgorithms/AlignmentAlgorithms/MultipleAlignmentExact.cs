@@ -41,7 +41,7 @@ namespace StringAlgorithms
             this.alignmentArray = new int[i + 1, j + 1, k + 1];
 
             alignmentCube = new AlignmentCube();
-            alignmentCube.Initialize(i, j, k, (x) => (parameters.CostArray.GapCostFun(x)), (x) => (parameters.CostArray.GapCostFun(x))); //powinno być to czy 0??!?!?! ValFun?
+            alignmentCube.Initialize(i, j, k); 
 
             for (int it = 0; it <= i; ++it)
             {
@@ -69,35 +69,65 @@ namespace StringAlgorithms
         protected override void ComputeAlignmentArray()
         {
 
-            int i = parameters.Sequences[0].Value.Length;
-            int j = parameters.Sequences[1].Value.Length;
-            int k = parameters.Sequences[2].Value.Length;
+            //int i = parameters.Sequences[0].Value.Length;
+            //int j = parameters.Sequences[1].Value.Length;
+            //int k = parameters.Sequences[2].Value.Length;
+            int i = parameters.Sequences[2].Value.Length;
+            int j = parameters.Sequences[0].Value.Length;
+            int k = parameters.Sequences[1].Value.Length;
             string A = parameters.Sequences[0].Value;
             string B = parameters.Sequences[1].Value;
             string C = parameters.Sequences[2].Value;
-
-            
             List<int>[] directionsInCube = Variancy(3);
-            
-            for (int it = 0; it <= i; ++it)
+            CubeIterator alignmentArrayIterator = alignmentCube.GetIterator();
+
+            alignmentArray[0, 0, 0] = 0;
+            while (alignmentArrayIterator.HasNext())
             {
-                for (int jt = 0; jt <= j; ++jt)
+                Cube currentCell = (Cube)alignmentArrayIterator.Next();
+                List<int> comingFromNeighborsCosts = new List<int>();
+                if (IsBorderCell(currentCell) == false)
                 {
-                    for (int kt = 0; kt <= k; ++kt)
+                    foreach (List<int> directionVector in directionsInCube)
                     {
-                        List<int> comingFromNeighborsCosts = new List<int>();
-                        foreach (List<int> directionVector in directionsInCube)
-                        {
-                            comingFromNeighborsCosts.Add(ComputeCell(it, jt, kt, directionVector[0], directionVector[1], directionVector[2]));
-                        }
-                        if (it == 0 && jt == 0 && kt == 0)
-                        {
-                            comingFromNeighborsCosts.Add(0);
-                        }
-                        alignmentArray[it, jt, kt] = MinFromList(comingFromNeighborsCosts);
-                    }
+                        comingFromNeighborsCosts.Add(ComputeCell(currentCell.rowIndex, currentCell.columnIndex, currentCell.depthIndex, directionVector[0], directionVector[1], directionVector[2]));
+                    }   
                 }
+                else
+                {
+                    //ComputeGapValue(currentCell);
+                    comingFromNeighborsCosts.Add(int.MaxValue / 2);
+                }
+                alignmentArray[currentCell.rowIndex, currentCell.columnIndex, currentCell.depthIndex] = MinFromList(comingFromNeighborsCosts);
             }
+
+        }
+
+        private bool IsBorderCell(Cube cell)
+        {
+            if (cell.rowIndex == 0 || cell.columnIndex == 0 || cell.depthIndex == 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private void ComputeGapValue(Cube cell)
+        {
+            //int gapCost = 0;
+            //if (cell.rowIndex == 0)
+            //{
+            //    gapCost = parameters.CostArray.GapCostFun(cell.columnIndex);
+            //}
+            //else if (cell.columnIndex == 0)
+            //{
+            //    gapCost = parameters.CostArray.GapCostFun(cell.rowIndex);
+            //}
+            //cell.value = gapCost;
+            //array.SetCell(cell);
         }
 
         private int ComputeCell(int i, int j, int k, int iOffset, int jOffset, int kOffset)

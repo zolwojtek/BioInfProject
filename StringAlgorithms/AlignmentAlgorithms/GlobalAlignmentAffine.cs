@@ -52,9 +52,9 @@ namespace StringAlgorithms
             helpArrayP = new AlignmentCube();
             helpArrayQ = new AlignmentCube();
 
-            alignmentArray2.Initialize(alignmentArrayRowNumber, alignmentArrayColumnNumber,0, (x) => 0, (x) => 0);
-            helpArrayP.Initialize(alignmentArrayRowNumber, alignmentArrayColumnNumber,0, (x) => 0,(x) => 0);
-            helpArrayQ.Initialize(alignmentArrayRowNumber, alignmentArrayColumnNumber,0,(x) => 0, (x) => 0);
+            alignmentArray2.Initialize(alignmentArrayRowNumber, alignmentArrayColumnNumber,0);
+            helpArrayP.Initialize(alignmentArrayRowNumber, alignmentArrayColumnNumber,0);
+            helpArrayQ.Initialize(alignmentArrayRowNumber, alignmentArrayColumnNumber,0);
         }
 
         protected override void ComputeAlignmentArray()

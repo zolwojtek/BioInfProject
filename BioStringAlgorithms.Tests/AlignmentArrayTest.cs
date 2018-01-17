@@ -11,7 +11,7 @@ namespace BioStringAlgorithms.Tests
     class AlignmentArrayTest
     {
         [Test]
-        public void GetIterator_GetAllElements_ReturnsElementsRowByRow()
+        public void GetIterator_GetAllElementsFromArray_ReturnsElementsRowByRow()
         {
             int[,,] fakeArray = new int[,,] { { { 0 }, { 0 }, { 0 }, { 0 } }, { { 0 }, { 1 }, { 2 }, { 3 } }, { { 0 }, { 4 }, { 5 }, { 6 } }, { { 0 }, { 7 }, { 8 }, { 9 } } };
             List<int> returnedValues = new List<int>();
@@ -23,6 +23,28 @@ namespace BioStringAlgorithms.Tests
 
             returnedValues.Add(((Cube)arrayIterator.GetCurrentCell()).value);
             while(arrayIterator.HasNext())
+            {
+                Cube returnedCell = (Cube)arrayIterator.Next();
+                returnedValues.Add(returnedCell.value);
+            }
+
+            CollectionAssert.AreEqual(returnedValues, correctValues);
+
+        }
+
+        [Test]
+        public void GetIterator_GetAllElementsFromCube_ReturnsElementsRowByRow()
+        {
+            int[,,] fakeArray = new int[,,] { { { 0, 1 }, { 0, 2 }, { 0, 3 }, { 0, 4 } }, { { 0, 5 }, { 1, 6 }, { 2, 7 }, { 3, 8 } }, { { 0, 9 }, { 4, 10 }, { 5, 11 }, { 6, 12 } }, { { 0, 13 }, { 7, 14 }, { 8, 15 }, { 9, 16 } } };
+            List<int> returnedValues = new List<int>();
+            List<int> correctValues = new List<int>() { 0, 0, 0, 0, 0, 1, 2, 3, 0, 4, 5, 6, 0, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
+            AlignmentCube alignmentArray = new AlignmentCube();
+            alignmentArray.Initialize(fakeArray);
+
+            CubeIterator arrayIterator = alignmentArray.GetIterator();
+
+            returnedValues.Add(((Cube)arrayIterator.GetCurrentCell()).value);
+            while (arrayIterator.HasNext())
             {
                 Cube returnedCell = (Cube)arrayIterator.Next();
                 returnedValues.Add(returnedCell.value);

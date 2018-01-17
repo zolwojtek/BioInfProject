@@ -48,7 +48,7 @@ namespace StringAlgorithms
             int alignmentArrayColumnNumber = parameters.Sequences[1].Value.Length;
 
             array = new AlignmentCube();
-            array.Initialize(alignmentArrayRowNumber, alignmentArrayColumnNumber, 0, (x) => 0, (x) => 0);
+            array.Initialize(alignmentArrayRowNumber, alignmentArrayColumnNumber, 0);
         }
 
         protected override void ComputeAlignmentArray()
