@@ -90,11 +90,15 @@ namespace StringAlgorithms
                 alignmentType = AlignmentType.NONE;
                 return 0;
             }
+            else if (firstSign == Constants.NEUTRAL_SIGN || secondSign == Constants.NEUTRAL_SIGN)
+            {
+                return 0;
+            }
             else if (firstSign == Constants.GAP || secondSign == Constants.GAP)
             {
                 alignmentType = AlignmentType.MATCH_WITH_GAP;
                 return GapCostFun(1);
-            }
+            } 
             else
             {
                 alignmentType = AlignmentType.MATCH_SIGNS;

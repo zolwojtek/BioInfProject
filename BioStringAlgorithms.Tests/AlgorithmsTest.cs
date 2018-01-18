@@ -110,10 +110,11 @@ namespace BioStringAlgorithms.Tests
         }
 
         [Test]
+        [Ignore("")]
         public void GetNumberOfOptimalAlignments_IsTheNumberCorrect_256()
         {
-            string str1 = System.IO.File.ReadAllText(@"C:\Users\Me\Documents\Visual Studio 2015\Projects\Project1Bio\Testing\Seq1.txt");
-            string str2 = System.IO.File.ReadAllText(@"C:\Users\Me\Documents\Visual Studio 2015\Projects\Project1Bio\Testing\Seq2.txt");
+            string str1 = System.IO.File.ReadAllText(@"E:\DOCUMENTS\Visual Studio 2017\Projects\Project1Bio\Testing\Seq1.txt");
+            string str2 = System.IO.File.ReadAllText(@"E:\DOCUMENTS\Visual Studio 2017\Projects\Project1Bio\Testing\Seq2.txt");
 
             Sequence seq1 = new Sequence(Constants.DNA, "seq1", str1);
             Sequence seq2 = new Sequence(Constants.DNA, "seq2", str2);

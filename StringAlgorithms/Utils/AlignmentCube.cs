@@ -89,9 +89,9 @@ namespace StringAlgorithms.Utils
             return cell;
         }
 
-        public int GetCellValue(int row, int column)
+        public int GetCellValue(int row, int column, int depth)
         {
-            return array[row, column, depthSize];
+            return array[row, column, depth];
         }
 
     }
@@ -114,7 +114,7 @@ namespace StringAlgorithms.Utils
 
         public void SetToCell(Cube cell)
         {
-            cell.value = alignmentArray.GetCellValue(cell.rowIndex, cell.columnIndex);
+            cell.value = alignmentArray.GetCellValue(cell.rowIndex, cell.columnIndex, cell.depthIndex);
             activeCell = cell;
         }
 

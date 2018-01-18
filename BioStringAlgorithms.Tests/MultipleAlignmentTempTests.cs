@@ -30,6 +30,7 @@ namespace BioStringAlgotihms.Tests
 
 
         [Test]
+        [Ignore("")]
         public void GetOptimalAlignmentScoreTest_94opt()
         {
             TextAlignmentParameters parameters = new TextAlignmentParameters();
@@ -57,6 +58,7 @@ namespace BioStringAlgotihms.Tests
         }
 
         [Test]
+        [Ignore("")]
         public void GetOptimalAlignmentScore_ReturnCountedAlignmentScore_198()
         {
             TextAlignmentParameters parameters = new TextAlignmentParameters();
@@ -83,6 +85,7 @@ namespace BioStringAlgotihms.Tests
         }
 
         [Test]
+        [Ignore("")]
         public void GetOptimalAlignmentScore_ReturnCountedAlignmentScore_1482()
         {
             TextAlignmentParameters parameters = new TextAlignmentParameters();
@@ -109,6 +112,7 @@ namespace BioStringAlgotihms.Tests
         }
 
         [Test]
+        [Ignore("")]
         public void GetOptimalAlignmentScore_ReturnCountedAlignmentScore_790()
         {
             TextAlignmentParameters parameters = new TextAlignmentParameters();
@@ -135,6 +139,7 @@ namespace BioStringAlgotihms.Tests
         }
 
         [Test]
+        [Ignore("")]
         public void CountAlignmentScore_AreTheScoresCorrectForExamplesFovideInFiles()
         {
             List<int> countedScores = new List<int>();

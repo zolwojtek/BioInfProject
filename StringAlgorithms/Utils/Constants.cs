@@ -14,5 +14,6 @@ namespace StringAlgorithms
         public const string RNA = @"ACGU";
         public const string ALPHABET = @"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         public const string ALFANUMERICAL = @"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        public const char NEUTRAL_SIGN = '@';
     }
 }

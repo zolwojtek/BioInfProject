@@ -43,45 +43,34 @@ namespace StringAlgorithms
             alignmentCube = new AlignmentCube();
             alignmentCube.Initialize(i, j, k); 
 
-            for (int it = 0; it <= i; ++it)
-            {
-                for (int jt = 0; jt <= j; ++jt)
-                {
-                    alignmentArray[it, jt, 0] = int.MaxValue / 2;
-                }
-            }
-            for (int it = 0; it <= i; ++it)
-            {
-                for (int kt = 0; kt <= k; ++kt)
-                {
-                    alignmentArray[it, 0, kt] = int.MaxValue / 2;
-                }
-            }
-            for (int kt = 0; kt <= k; ++kt)
-            {
-                for (int jt = 0; jt <= j; ++jt)
-                {
-                    alignmentArray[0, jt, kt] = int.MaxValue / 2;
-                }
-            }
+            //for (int it = 0; it <= i; ++it)
+            //{
+            //    for (int jt = 0; jt <= j; ++jt)
+            //    {
+            //        alignmentArray[it, jt, 0] = int.MaxValue / 2;
+            //    }
+            //}
+            //for (int it = 0; it <= i; ++it)
+            //{
+            //    for (int kt = 0; kt <= k; ++kt)
+            //    {
+            //        alignmentArray[it, 0, kt] = int.MaxValue / 2;
+            //    }
+            //}
+            //for (int kt = 0; kt <= k; ++kt)
+            //{
+            //    for (int jt = 0; jt <= j; ++jt)
+            //    {
+            //        alignmentArray[0, jt, kt] = int.MaxValue / 2;
+            //    }
+            //}
         }
 
         protected override void ComputeAlignmentArray()
         {
-
-            //int i = parameters.Sequences[0].Value.Length;
-            //int j = parameters.Sequences[1].Value.Length;
-            //int k = parameters.Sequences[2].Value.Length;
-            int i = parameters.Sequences[2].Value.Length;
-            int j = parameters.Sequences[0].Value.Length;
-            int k = parameters.Sequences[1].Value.Length;
-            string A = parameters.Sequences[0].Value;
-            string B = parameters.Sequences[1].Value;
-            string C = parameters.Sequences[2].Value;
             List<int>[] directionsInCube = Variancy(3);
             CubeIterator alignmentArrayIterator = alignmentCube.GetIterator();
 
-            alignmentArray[0, 0, 0] = 0;
             while (alignmentArrayIterator.HasNext())
             {
                 Cube currentCell = (Cube)alignmentArrayIterator.Next();
@@ -91,37 +80,10 @@ namespace StringAlgorithms
                 {
                     comingFromNeighborsCosts.Add(ComputeCell(currentCell.rowIndex, currentCell.columnIndex, currentCell.depthIndex, directionVector[0], directionVector[1], directionVector[2]));
                 }
-                if (currentCell.rowIndex == 0 && currentCell.columnIndex == 0 && currentCell.depthIndex == 0)
-                {
-                    comingFromNeighborsCosts.Add(0);
-                }
+
                 alignmentArray[currentCell.rowIndex, currentCell.columnIndex, currentCell.depthIndex] = MinFromList(comingFromNeighborsCosts);
-
-                //if (IsBorderCell(currentCell) == false)
-                //{
-                //    //ComputeCell(currentCell);
-                //}
-                //else
-                //{
-                //    //ComputeGapValue(currentCell);
-                //}
-            }
-
-        }
-
-        private bool IsBorderCell(Cube cell)
-        {
-            if (cell.rowIndex == 0 || cell.columnIndex == 0 || cell.depthIndex == 0)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
             }
         }
-
-
 
         private int ComputeCell(int i, int j, int k, int iOffset, int jOffset, int kOffset)
         {
@@ -154,7 +116,7 @@ namespace StringAlgorithms
         private int ComputeAligningValue(char a, char b, char c)
         {
             int score = 0;
-            score += parameters.CostArray.GetLettersAlignmentCost(a,b);
+            score += parameters.CostArray.GetLettersAlignmentCost(a, b);
             score += parameters.CostArray.GetLettersAlignmentCost(b, c);
             score += parameters.CostArray.GetLettersAlignmentCost(a, c);
             return score;
@@ -275,7 +237,7 @@ namespace StringAlgorithms
             return alignmentArray[i,j,k];
         }
 
-        private int index(int m)
+        private int Index(int m)
         {
             int i = 0;
             while (m % 2 == 0)
@@ -307,7 +269,7 @@ namespace StringAlgorithms
             do
             {
                 ++m;
-                i = index(m) + 1;
+                i = Index(m) + 1;
                 if (i <= k)
                 {
                     w[i] = w[i] + skok[i];

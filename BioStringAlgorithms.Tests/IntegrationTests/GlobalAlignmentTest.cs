@@ -62,8 +62,8 @@ namespace BioStringAlgorithms.Tests
         public void GetOptimalAlignment_CheckingIfComputedAligmentGivesComputedScore_1346()
         {
             TextAlignmentParameters parameters = new TextAlignmentParameters();
-            string str1 = System.IO.File.ReadAllText(@"C:\Users\Me\Documents\Visual Studio 2015\Projects\Project1Bio\Testing\Seq1.txt");
-            string str2 = System.IO.File.ReadAllText(@"C:\Users\Me\Documents\Visual Studio 2015\Projects\Project1Bio\Testing\Seq2.txt");
+            string str1 = System.IO.File.ReadAllText(@"E:\DOCUMENTS\Visual Studio 2017\Projects\Project1Bio\Testing\Seq1.txt");
+            string str2 = System.IO.File.ReadAllText(@"E:\DOCUMENTS\Visual Studio 2017\Projects\Project1Bio\Testing\Seq2.txt");
 
             Sequence seq1 = new Sequence(Constants.DNA, "seq1", str1);
             Sequence seq2 = new Sequence(Constants.DNA, "seq2", str2);
@@ -135,8 +135,8 @@ namespace BioStringAlgorithms.Tests
         public void GetNumberOfOptimalSolutions_CheckingComputedNumberOfSolutions_256()
         {
             TextAlignmentParameters parameters = new TextAlignmentParameters();
-            string str1 = System.IO.File.ReadAllText(@"C:\Users\Me\Documents\Visual Studio 2015\Projects\Project1Bio\Testing\Seq1.txt");
-            string str2 = System.IO.File.ReadAllText(@"C:\Users\Me\Documents\Visual Studio 2015\Projects\Project1Bio\Testing\Seq2.txt");
+            string str1 = System.IO.File.ReadAllText(@"E:\DOCUMENTS\Visual Studio 2017\Projects\Project1Bio\Testing\Seq1.txt");
+            string str2 = System.IO.File.ReadAllText(@"E:\DOCUMENTS\Visual Studio 2017\Projects\Project1Bio\Testing\Seq2.txt");
 
             Sequence seq1 = new Sequence(Constants.DNA, "seq1", str1);
             Sequence seq2 = new Sequence(Constants.DNA, "seq2", str2);

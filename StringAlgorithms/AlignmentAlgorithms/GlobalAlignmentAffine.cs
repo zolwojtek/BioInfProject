@@ -150,8 +150,8 @@ namespace StringAlgorithms
         {
             int cellRow = cell.rowIndex;
             int cellColumn = cell.columnIndex;
-            int gapStartingCost = alignmentArray2.GetCellValue(cellRow, cellColumn) + parameters.CostArray.GetGapStartingCost();
-            int gapExtensionCost = helpArray.GetCellValue(cellRow, cellColumn) + parameters.CostArray.GetGapExtensionCost();
+            int gapStartingCost = alignmentArray2.GetCellValue(cellRow, cellColumn, cell.depthIndex) + parameters.CostArray.GetGapStartingCost();
+            int gapExtensionCost = helpArray.GetCellValue(cellRow, cellColumn, cell.depthIndex) + parameters.CostArray.GetGapExtensionCost();
             return parameters.Comparefunction(gapStartingCost, gapExtensionCost);
         }
 
@@ -159,7 +159,7 @@ namespace StringAlgorithms
         {
             int cellRow = cell.rowIndex;
             int cellColumn = cell.columnIndex;
-            int cost = alignmentArray2.GetCellValue(cellRow, cellColumn) + parameters.CostArray.GetLettersAlignmentCost(parameters.Sequences[0].Value[cellRow], parameters.Sequences[1].Value[cellColumn]);
+            int cost = alignmentArray2.GetCellValue(cellRow, cellColumn, cell.depthIndex) + parameters.CostArray.GetLettersAlignmentCost(parameters.Sequences[0].Value[cellRow], parameters.Sequences[1].Value[cellColumn]);
             return cost;
         }
 
@@ -258,7 +258,7 @@ namespace StringAlgorithms
             int nGapCost = parameters.CostArray.GapCostFun(gapLength);
             if (from.columnIndex - gapLength >= 0)
             {
-                horizontalGapsCost = alignmentArray2.GetCellValue(from.rowIndex, from.columnIndex - gapLength) + nGapCost;
+                horizontalGapsCost = alignmentArray2.GetCellValue(from.rowIndex, from.columnIndex - gapLength, from.depthIndex) + nGapCost;
             }
             else
             {
@@ -266,7 +266,7 @@ namespace StringAlgorithms
             }
             if (from.rowIndex - gapLength >= 0)
             {
-                verticalGapsCost = alignmentArray2.GetCellValue(from.rowIndex - gapLength, from.columnIndex) + nGapCost;
+                verticalGapsCost = alignmentArray2.GetCellValue(from.rowIndex - gapLength, from.columnIndex, from.depthIndex) + nGapCost;
             }
             else
             {
