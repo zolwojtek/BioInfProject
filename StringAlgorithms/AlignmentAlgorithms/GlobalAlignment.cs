@@ -16,48 +16,32 @@ namespace StringAlgorithms
         private int fromUpNeighborCost = 0;
         private int fromLeftNeighborCost = 0;
         private const int illegalValue = Int32.MinValue;
-        private Alignment computedAlignment = null;
-        private StringBuilder firstSeqenceOfAlignment = null;
-        private StringBuilder secondSequenceOfAlignment = null;
-        private AlignmentCube array;
+        
 
         public GlobalAlignment(TextAlignmentParameters parameters) : base(parameters)
         {
 
         }
 
-        public override Alignment GetOptimalAlignment()
-        {
-            ComputeAlignmentArrayIfNecessary();
-            RetrieveAlignmentIfNecessary();
-            return computedAlignment;
-        }
-
-        private void ComputeAlignmentArrayIfNecessary()
-        {
-            if (this.alignmentArray == null)
-            {
-                InitializeAlignmentArray();
-                ComputeAlignmentArray();
-            }
-        }
-
-        private void InitializeAlignmentArray()
+        //later to extract to TextAlignmentAlgorithm
+        protected override void InitializeAlignmentArray()
         {
             int alignmentArrayRowNumber = parameters.Sequences[0].Value.Length;
             int alignmentArrayColumnNumber = parameters.Sequences[1].Value.Length;
 
             array = new AlignmentCube();
             array.Initialize(alignmentArrayRowNumber, alignmentArrayColumnNumber, 0);
+            //temporary
+            parameters.Sequences.Add(null);
         }
+
+
 
         protected override void ComputeAlignmentArray()
         {
-            List<int>[] directionsInCube = Variancy(2);
+            List<int>[] directionsInCube = Variancy(parameters.GetNumberOfSequences());
             CubeIterator alignmentArrayIterator = array.GetIterator();
-            //temporary
-            parameters.Sequences.Add(new Sequence("@", "name", "@"));
-
+            
             while (alignmentArrayIterator.HasNext())
             {
                 Cube currentCell = (Cube)alignmentArrayIterator.Next();
@@ -66,7 +50,7 @@ namespace StringAlgorithms
                 List<int> comingFromNeighborsCosts = new List<int>();
                 foreach (List<int> directionVector in directionsInCube)
                 {
-                    comingFromNeighborsCosts.Add(ComputeCell(currentCell.rowIndex, currentCell.columnIndex, 1, directionVector[0], directionVector[1], 1));
+                    comingFromNeighborsCosts.Add(ComputeCell(currentCell, directionVector));
                 }
                 //NOT MIN - COMPAREFUN
                 currentCell.value = MinFromList(comingFromNeighborsCosts);
@@ -74,39 +58,8 @@ namespace StringAlgorithms
             }
         }
 
-        private int ComputeCell(int i, int j, int k, int iOffset, int jOffset, int kOffset)
-        { 
-            if (i - iOffset >= 0 && j - jOffset >= 0 && k - kOffset >= 0)
-            {
-                string A = parameters.Sequences[0].Value;
-                string B = parameters.Sequences[1].Value;
-                string C = parameters.Sequences[2].Value;
-                char a, b, c;
-                a = FetchSign(A, i, iOffset);
-                b = FetchSign(B, j, jOffset);
-                c = FetchSign(C, k, kOffset);
 
-                return array.GetCellValue(i - iOffset, j - jOffset, k - kOffset) + ComputeAligningValue(a, b, c);
-            }
-            return GetIlligalValue();
-        }
-
-        private int GetIlligalValue()
-        {
-            int a = 1;
-            int b = 0;
-            int c = parameters.Comparefunction(a, b);
-            if(c == 0)
-            {
-                return int.MaxValue / 2;
-            }
-            else
-            {
-                return int.MinValue / 2;
-            }
-        }
-
-        private int ComputeAligningValue(char a, char b, char c)
+        protected override int ComputeAligningValue(char a, char b, char c)
         {
             int score = 0;
             score += parameters.CostArray.GetLettersAlignmentCost(a, b);
@@ -115,7 +68,7 @@ namespace StringAlgorithms
             return score;
         }
 
-        private char FetchSign(string seq, int i, int iOffset)
+        protected override char FetchSign(string seq, int i, int iOffset)
         {
             if (iOffset == 0)
             {
@@ -162,14 +115,8 @@ namespace StringAlgorithms
             }
         }
 
-        private void InitializeSequencesOfAlignment()
-        {
-            firstSeqenceOfAlignment = new StringBuilder("");
-            secondSequenceOfAlignment = new StringBuilder("");
-        }
 
-
-        private void RetrieveAlignment()
+        protected override void RetrieveAlignment()
         {
             Cube currentCell = array.GetCell(array.rowSize, array.columnSize, 0);
 
@@ -197,7 +144,7 @@ namespace StringAlgorithms
 
             foreach(List<int> directionVector in possibleDirectionInArray)
             {
-                int comingFromNeighborCost = ComputeCell(from.rowIndex, from.columnIndex, 1, directionVector[0], directionVector[1], 1);
+                int comingFromNeighborCost = ComputeCell(from, directionVector);
                 if(comingFromNeighborCost == from.value)
                 {
                     newCell = array.GetCell(from.rowIndex - directionVector[0], from.columnIndex - directionVector[1],0);
@@ -296,7 +243,7 @@ namespace StringAlgorithms
             List<int>[] possibleDirectionInArray = Variancy(2);
             foreach (List<int> directionVector in possibleDirectionInArray)
             {
-                int comingFromNeighborCost = ComputeCell(cell.rowIndex, cell.columnIndex, 1, directionVector[0], directionVector[1], 1);
+                int comingFromNeighborCost = ComputeCell(cell, directionVector);
                 if (comingFromNeighborCost == cell.value)
                 {
                     Cube newCell = new Cube();

@@ -77,13 +77,13 @@
     <Compile Include="AlignmentAlgorithms\Graph.cs" />
     <Content Include="AlignmentAlgorithms\GraphBAK.txt" />
     <Compile Include="AlignmentAlgorithms\MultipleAlignmentExact.cs" />
-    <Compile Include="AlignmentAlgorithms\MultipleAlignmentTemp.cs" />
     <Compile Include="Enums\AlignmentTypeEnum.cs" />
     <Compile Include="Algorithms.cs" />
     <Compile Include="Enums\AlignmentStrategyEnum.cs" />
     <Compile Include="AlignmentAlgorithms\GlobalAlignmentAffine.cs" />
     <Compile Include="Enums\Directions.cs" />
     <Compile Include="Enums\FunctionTypeEnum.cs" />
+    <Compile Include="MultipleAlignmentTemp.cs" />
     <Compile Include="Utils\Alignment.cs" />
     <Compile Include="Utils\AlignmentCube.cs" />
     <Compile Include="Utils\Cube.cs" />

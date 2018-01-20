@@ -110,7 +110,7 @@ namespace BioStringAlgorithms.Tests
         }
 
         [Test]
-        [Ignore("")]
+        //[Ignore("")]
         public void GetNumberOfOptimalAlignments_IsTheNumberCorrect_256()
         {
             string str1 = System.IO.File.ReadAllText(@"E:\DOCUMENTS\Visual Studio 2017\Projects\Project1Bio\Testing\Seq1.txt");
@@ -125,7 +125,7 @@ namespace BioStringAlgorithms.Tests
         }
 
         [Test]
-        [Ignore("")]
+        //[Ignore("")]
         public void CountAlignmentScore_AreTheScoresCorrectForExamplesFovideInFilesApprox()
         {
             algorithms.SetLimitsForExactMultipleAlignment(1, 1); //to be sure approx wil be used

@@ -164,5 +164,20 @@ namespace StringAlgorithms
                 ComputeAlignmentArray();
             }
         }
+
+        protected override void InitializeAlignmentArray()
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void RetrieveAlignment()
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override char FetchSign(string a, int rowIndex, int yOffset)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

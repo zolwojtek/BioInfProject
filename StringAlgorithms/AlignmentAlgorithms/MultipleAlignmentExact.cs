@@ -9,68 +9,36 @@ namespace StringAlgorithms
 {
     public class MultipleAlignmentExact : TextAlignmentAlgorithm
     {
-        private new int[, ,] alignmentArray;
-        private AlignmentCube alignmentCube = null;
-        private Alignment computedAlignment = null;
-        private StringBuilder firstSeqenceOfAlignment = null;
-        private StringBuilder secondSequenceOfAlignment = null;
-        private StringBuilder thirdSequenceOfAlignment = null;
+        //private new int[, ,] alignmentArray;
+        //private AlignmentCube array = null;
+
 
         public MultipleAlignmentExact(TextAlignmentParameters parameters) : base(parameters)
         {
 
         }
 
-
-
-        public override Alignment GetOptimalAlignment()
+        protected override void InitializeSequencesOfAlignment()
         {
-            ComputeAlignmentArrayIfNecessary();
-            RetrieveAlignmentIfNecessary();
-            return computedAlignment;
-        }
-
-        private void ComputeAlignmentArrayIfNecessary()
-        {
-            if (this.alignmentArray == null)
-            {
-                InitializeAlignmentArray();
-                ComputeAlignmentArray();
-            }
-        }
-
-        private void RetrieveAlignmentIfNecessary()
-        {
-            if (computedAlignment == null)//TODO: dodać przy zmanie parametrów, że null itd
-            {
-                InitializeSequencesOfAlignment();
-                RetrieveAlignment();
-            }
-        }
-
-        private void InitializeSequencesOfAlignment()
-        {
-            firstSeqenceOfAlignment = new StringBuilder();
-            secondSequenceOfAlignment = new StringBuilder();
+            base.InitializeSequencesOfAlignment();
             thirdSequenceOfAlignment = new StringBuilder();
         }
 
-        private void InitializeAlignmentArray()
+        protected override void InitializeAlignmentArray()
         {
             int i = parameters.Sequences[0].Value.Length;
             int j = parameters.Sequences[1].Value.Length;
             int k = parameters.Sequences[2].Value.Length;
-            this.alignmentArray = new int[i + 1, j + 1, k + 1];
+            //this.alignmentArray = new int[i + 1, j + 1, k + 1];
 
-            alignmentCube = new AlignmentCube();
-            alignmentCube.Initialize(i, j, k); 
-
+            array = new AlignmentCube();
+            array.Initialize(i, j, k); 
         }
 
         protected override void ComputeAlignmentArray()
         {
-            List<int>[] directionsInCube = Variancy(3);
-            CubeIterator alignmentArrayIterator = alignmentCube.GetIterator();
+            List<int>[] directionsInCube = Variancy(parameters.GetNumberOfSequences());
+            CubeIterator alignmentArrayIterator = array.GetIterator();
 
             while (alignmentArrayIterator.HasNext())
             {
@@ -79,30 +47,15 @@ namespace StringAlgorithms
                 List<int> comingFromNeighborsCosts = new List<int>();
                 foreach (List<int> directionVector in directionsInCube)
                 {
-                    comingFromNeighborsCosts.Add(ComputeCell(currentCell.rowIndex, currentCell.columnIndex, currentCell.depthIndex, directionVector[0], directionVector[1], directionVector[2]));
+                    comingFromNeighborsCosts.Add(ComputeCell(currentCell, directionVector));
                 }
 
-                alignmentArray[currentCell.rowIndex, currentCell.columnIndex, currentCell.depthIndex] = MinFromList(comingFromNeighborsCosts);
+                //alignmentArray[currentCell.rowIndex, currentCell.columnIndex, currentCell.depthIndex] = MinFromList(comingFromNeighborsCosts);
+                array.SetCell(currentCell);
                 currentCell.value = MinFromList(comingFromNeighborsCosts);
-                alignmentCube.SetCell(currentCell);
             }
         }
 
-        private int ComputeCell(int i, int j, int k, int iOffset, int jOffset, int kOffset)
-        {
-            if (i - iOffset >= 0 && j - jOffset >= 0 && k - kOffset >= 0)
-            {
-                string A = parameters.Sequences[0].Value;
-                string B = parameters.Sequences[1].Value;
-                string C = parameters.Sequences[2].Value;
-                char a, b, c;
-                a = FetchSign(A, i, iOffset);
-                b = FetchSign(B, j, jOffset);
-                c = FetchSign(C, k, kOffset);
-                return alignmentArray[i - iOffset, j - jOffset, k - kOffset] + ComputeAligningValue(a, b, c);
-            }
-            return int.MaxValue - 1000;
-        }
 
 
         private int MinFromList(List<int> list)
@@ -116,7 +69,7 @@ namespace StringAlgorithms
             return min;
         }
 
-        private int ComputeAligningValue(char a, char b, char c)
+        protected override int ComputeAligningValue(char a, char b, char c)
         {
             int score = 0;
             score += parameters.CostArray.GetLettersAlignmentCost(a, b);
@@ -125,7 +78,7 @@ namespace StringAlgorithms
             return score;
         }
 
-        private char FetchSign(string seq, int i, int iOffset)
+        protected override char FetchSign(string seq, int i, int iOffset)
         {
             if(iOffset == 0)
             {
@@ -135,14 +88,10 @@ namespace StringAlgorithms
         }
 
 
-        private Alignment RetrieveAlignment()
+        protected override void RetrieveAlignment()
         {
-            firstSeqenceOfAlignment = new StringBuilder();
-            secondSequenceOfAlignment = new StringBuilder();
-            thirdSequenceOfAlignment = new StringBuilder();
-            computedAlignment = new Alignment();
 
-            Cube currentCell = alignmentCube.GetCell(alignmentCube.rowSize, alignmentCube.columnSize, alignmentCube.depthSize);
+            Cube currentCell = array.GetCell(array.rowSize, array.columnSize, array.depthSize);
 
             while (currentCell.IsTopLeftCell() == false)
             {
@@ -154,7 +103,6 @@ namespace StringAlgorithms
             Sequence secondAlignmentSeq = new Sequence(Constants.ALIGNMENT_DNA, parameters.Sequences[1].Name, secondSequenceOfAlignment.ToString());
             Sequence thirdAlignmentSeq = new Sequence(Constants.ALIGNMENT_DNA, parameters.Sequences[2].Name, thirdSequenceOfAlignment.ToString());
             computedAlignment = new Alignment(new List<Sequence>(){ firstAlignmentSeq, secondAlignmentSeq, thirdAlignmentSeq });
-            return computedAlignment;
         }
 
         private Cube GoOneStepBack(Cube from)
@@ -168,7 +116,7 @@ namespace StringAlgorithms
 
             foreach (List<int> directionVector in possibleDirectionInArray)
             {
-                int comingFromNeighborCost = ComputeCell(from.rowIndex, from.columnIndex, from.depthIndex, directionVector[0], directionVector[1], directionVector[2]);
+                int comingFromNeighborCost = ComputeCell(from, directionVector);
                 if (comingFromNeighborCost == from.value)
                 {
                     char a, b, c;
@@ -178,7 +126,7 @@ namespace StringAlgorithms
                     firstSeqenceOfAlignment.Insert(0, a);
                     secondSequenceOfAlignment.Insert(0, b);
                     thirdSequenceOfAlignment.Insert(0, c);
-                    newCell = alignmentCube.GetCell(from.rowIndex - directionVector[0], from.columnIndex - directionVector[1], from.depthIndex - directionVector[2]);
+                    newCell = array.GetCell(from.rowIndex - directionVector[0], from.columnIndex - directionVector[1], from.depthIndex - directionVector[2]);
                     break;
                 }
             }
@@ -191,7 +139,7 @@ namespace StringAlgorithms
         public override int GetOptimalAlignmentScore()
         {
             ComputeAlignmentArrayIfNecessary();
-            Cube bestScoreCell = alignmentCube.GetCell(alignmentCube.rowSize, alignmentCube.columnSize, alignmentCube.depthSize);
+            Cube bestScoreCell = array.GetCell(array.rowSize, array.columnSize, array.depthSize);
             int optimalScore = bestScoreCell.value;
             return optimalScore;
         }
@@ -260,7 +208,7 @@ namespace StringAlgorithms
             ComputeAlignmentArrayIfNecessary();
             int optimalSolutionsNumber = 0;
 
-            Cube startCell = alignmentCube.GetCell(alignmentCube.rowSize, alignmentCube.columnSize, alignmentCube.depthSize);
+            Cube startCell = array.GetCell(array.rowSize, array.columnSize, array.depthSize);
 
             optimalSolutionsNumber = CountNumberOfOptimalSolutions(startCell);
             return optimalSolutionsNumber;
@@ -278,11 +226,11 @@ namespace StringAlgorithms
             List<int>[] possibleDirectionInArray = Variancy(3);
             foreach (List<int> directionVector in possibleDirectionInArray)
             {
-                int comingFromNeighborCost = ComputeCell(cell.rowIndex, cell.columnIndex, cell.depthIndex, directionVector[0], directionVector[1], directionVector[2]);
+                int comingFromNeighborCost = ComputeCell(cell, directionVector);
                 if (comingFromNeighborCost == cell.value)
                 {
                     Cube newCell = new Cube();
-                    newCell = alignmentCube.GetCell(cell.rowIndex - directionVector[0], cell.columnIndex - directionVector[1], cell.depthIndex - directionVector[2]);
+                    newCell = array.GetCell(cell.rowIndex - directionVector[0], cell.columnIndex - directionVector[1], cell.depthIndex - directionVector[2]);
                     optimalSolutionsNumber += CountNumberOfOptimalSolutions(newCell);
                 }
             }

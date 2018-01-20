@@ -45,25 +45,33 @@ namespace StringAlgorithms
 
         public int GetNumberOfSequences()
         {
-            return Sequences.Count();
+            int seqNumber = 0;
+            foreach(Sequence seq in Sequences)
+            {
+                if(seq != null)
+                {
+                    ++seqNumber;
+                }
+            }
+            return seqNumber;
         }
-        //public void RemoveSequence(int idx)
-        //{
-        //    --idx;
-        //    try
-        //    {
-        //        sequences.RemoveAt(idx);
-        //    }
-        //    catch
-        //    {
-        //        throw new Exception(String.Format("There is not any sequence under given index!"));
-        //    }
-        //}
-        //public void AddSequence(string seq)
-        //{
-        //    sequences.Add(seq);
-        //}
 
-       
+
+        public int GetIlligalValue()
+        {
+            int a = 1;
+            int b = 0;
+            int c = Comparefunction(a, b);
+            if (c == 0)
+            {
+                return int.MaxValue / 2;
+            }
+            else
+            {
+                return int.MinValue / 2;
+            }
+        }
+
+
     }
 }

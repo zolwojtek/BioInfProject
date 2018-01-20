@@ -18,32 +18,15 @@ namespace StringAlgorithms
         private AlignmentCube alignmentArray2;
         private AlignmentCube helpArrayP;
         private AlignmentCube helpArrayQ;
-        private Alignment computedAlignment = null;
-        private StringBuilder firstSeqenceOfAlignment = null;
-        private StringBuilder secondSequenceOfAlignment = null;
 
         public GlobalAlignmentAffine(TextAlignmentParameters parameters) : base(parameters)
         {
 
         }
 
-        public override Alignment GetOptimalAlignment()
-        {
-            ComputeAlignmentArrayIfNecessary();
-            RetrieveAlignmentIfNecessary();
-            return computedAlignment;
-        }
 
-        private void ComputeAlignmentArrayIfNecessary()
-        {
-            if (this.alignmentArray == null)
-            {
-                InitializeAlignmentArray();
-                ComputeAlignmentArray2();
-            }
-        }
 
-        private void InitializeAlignmentArray()
+        protected override void InitializeAlignmentArray()
         {
             int alignmentArrayRowNumber = parameters.Sequences[0].Value.Length;
             int alignmentArrayColumnNumber = parameters.Sequences[1].Value.Length;
@@ -143,7 +126,7 @@ namespace StringAlgorithms
             return score;
         }
 
-        private char FetchSign(string seq, int i, int iOffset)
+        protected override char FetchSign(string seq, int i, int iOffset)
         {
             if (iOffset == 0)
             {
@@ -271,13 +254,9 @@ namespace StringAlgorithms
             }
         }
 
-        private void InitializeSequencesOfAlignment()
-        {
-            firstSeqenceOfAlignment = new StringBuilder("");
-            secondSequenceOfAlignment = new StringBuilder("");
-        }
 
-        private void RetrieveAlignment()
+
+        protected override void RetrieveAlignment()
         {
             CubeIterator iterator = alignmentArray2.GetIterator();
             iterator.SetToCell(new Cube(alignmentArray2.rowSize, alignmentArray2.columnSize,0));
