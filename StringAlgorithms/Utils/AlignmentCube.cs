@@ -80,12 +80,12 @@ namespace StringAlgorithms.Utils
 
         public void SetCell(Cube cell)
         {
-            array[cell.rowIndex, cell.columnIndex, 0] = cell.value;
+            array[cell.rowIndex, cell.columnIndex, cell.depthIndex] = cell.value;
         }
 
-        public Cube GetCell(int row, int column)
+        public Cube GetCell(int row, int column, int depth)
         {
-            Cube cell = new Cube(row, column,0, array[row, column, depthSize]);
+            Cube cell = new Cube(row, column, depth, array[row, column, depth]);
             return cell;
         }
 

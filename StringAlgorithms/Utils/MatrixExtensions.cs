@@ -13,7 +13,7 @@ namespace StringAlgorithms
 
         public static int[,,] FillRowWithIntValue(this int[,,] matrix, int rowIdx, int depthIdx, ValueFun fun)
         {
-            for (int i = 1; i < matrix.GetLength(1); ++i)
+            for (int i = 0; i < matrix.GetLength(1); ++i)
             {
                 matrix[rowIdx, i, depthIdx] = fun(i);
             }
@@ -22,7 +22,7 @@ namespace StringAlgorithms
 
         public static int[,,] FillColumnWithIntValue(this int[,,] matrix, int columnIdx, int depthIdx, ValueFun fun)
         {
-            for (int i = 1; i < matrix.GetLength(0); ++i)
+            for (int i = 0; i < matrix.GetLength(0); ++i)
             {
                 matrix[i, columnIdx, depthIdx] = fun(i);
             }

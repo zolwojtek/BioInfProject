@@ -409,6 +409,7 @@ namespace BioStringAlgorithms.Tests
         }
 
         [Test]
+        [Ignore("")]
         public void GetOptimalAlignment_ReturnFoundAlignment_isOneofOptimal6()
         {
             string str1 = @"ggcctaaaggcgccggtctttcgtaccccaaaatctcggcattttaagataagtgagtgttgcgttacactagcgatctaccgcgtcttatacttaagcgtatgcccagatctgactaatcgtgcccccggattagacgggcttgatgggaaagaacagctcgtctgtttacgtataaacagaatcgcctgggttcgc".ToUpper();
@@ -423,6 +424,7 @@ namespace BioStringAlgorithms.Tests
         }
 
         [Test]
+        [Ignore("")]
         public void GetOptimalAlignment_ReturnFoundAlignment_isOneofOptimal7()
         {
             string str1 = @"ggcctaaaggcgccggtctttcgtaccccaaaatctcggcattttaagataagtgagtgttgcgttacactagcgatctaccgcgtcttatacttaagcgtatgcccagatctgactaatcgtgcccccggattagacgggcttgatgggaaagaacagctcgtctgtttacgtataaacagaatcgcctgggttcgc".ToUpper();
@@ -437,6 +439,7 @@ namespace BioStringAlgorithms.Tests
         }
 
         [Test]
+        [Ignore("")]
         public void GetOptimalAlignment_ReturnFoundAlignment_isOneofOptimal8()
         {
             string str1 = @"tatggagagaataaaagaactgagagatctaatgtcgcagtcccgcactcgcgagatactcactaagaccactgtggaccatatggccataatcaaaaag".ToUpper();

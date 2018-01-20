@@ -11,17 +11,23 @@ namespace StringAlgorithms
     {
         private new int[, ,] alignmentArray;
         private AlignmentCube alignmentCube = null;
-
+        private Alignment computedAlignment = null;
+        private StringBuilder firstSeqenceOfAlignment = null;
+        private StringBuilder secondSequenceOfAlignment = null;
+        private StringBuilder thirdSequenceOfAlignment = null;
 
         public MultipleAlignmentExact(TextAlignmentParameters parameters) : base(parameters)
         {
 
         }
 
+
+
         public override Alignment GetOptimalAlignment()
         {
             ComputeAlignmentArrayIfNecessary();
-            return GetAligment();
+            RetrieveAlignmentIfNecessary();
+            return computedAlignment;
         }
 
         private void ComputeAlignmentArrayIfNecessary()
@@ -31,6 +37,22 @@ namespace StringAlgorithms
                 InitializeAlignmentArray();
                 ComputeAlignmentArray();
             }
+        }
+
+        private void RetrieveAlignmentIfNecessary()
+        {
+            if (computedAlignment == null)//TODO: dodać przy zmanie parametrów, że null itd
+            {
+                InitializeSequencesOfAlignment();
+                RetrieveAlignment();
+            }
+        }
+
+        private void InitializeSequencesOfAlignment()
+        {
+            firstSeqenceOfAlignment = new StringBuilder();
+            secondSequenceOfAlignment = new StringBuilder();
+            thirdSequenceOfAlignment = new StringBuilder();
         }
 
         private void InitializeAlignmentArray()
@@ -43,27 +65,6 @@ namespace StringAlgorithms
             alignmentCube = new AlignmentCube();
             alignmentCube.Initialize(i, j, k); 
 
-            //for (int it = 0; it <= i; ++it)
-            //{
-            //    for (int jt = 0; jt <= j; ++jt)
-            //    {
-            //        alignmentArray[it, jt, 0] = int.MaxValue / 2;
-            //    }
-            //}
-            //for (int it = 0; it <= i; ++it)
-            //{
-            //    for (int kt = 0; kt <= k; ++kt)
-            //    {
-            //        alignmentArray[it, 0, kt] = int.MaxValue / 2;
-            //    }
-            //}
-            //for (int kt = 0; kt <= k; ++kt)
-            //{
-            //    for (int jt = 0; jt <= j; ++jt)
-            //    {
-            //        alignmentArray[0, jt, kt] = int.MaxValue / 2;
-            //    }
-            //}
         }
 
         protected override void ComputeAlignmentArray()
@@ -82,6 +83,8 @@ namespace StringAlgorithms
                 }
 
                 alignmentArray[currentCell.rowIndex, currentCell.columnIndex, currentCell.depthIndex] = MinFromList(comingFromNeighborsCosts);
+                currentCell.value = MinFromList(comingFromNeighborsCosts);
+                alignmentCube.SetCell(currentCell);
             }
         }
 
@@ -132,109 +135,65 @@ namespace StringAlgorithms
         }
 
 
-
-
-
-        private Alignment GetAligment()
+        private Alignment RetrieveAlignment()
         {
-            int i = parameters.Sequences[0].Value.Length;
-            int j = parameters.Sequences[1].Value.Length;
-            int k = parameters.Sequences[2].Value.Length;
-            string answerSeq1 = "";
-            string answerSeq2 = "";
-            string answerSeq3 = "";
+            firstSeqenceOfAlignment = new StringBuilder();
+            secondSequenceOfAlignment = new StringBuilder();
+            thirdSequenceOfAlignment = new StringBuilder();
+            computedAlignment = new Alignment();
+
+            Cube currentCell = alignmentCube.GetCell(alignmentCube.rowSize, alignmentCube.columnSize, alignmentCube.depthSize);
+
+            while (currentCell.IsTopLeftCell() == false)
+            {
+                Cube newCell = GoOneStepBack(currentCell);
+
+                currentCell = newCell;
+            }
+            Sequence firstAlignmentSeq = new Sequence(Constants.ALIGNMENT_DNA, parameters.Sequences[0].Name, firstSeqenceOfAlignment.ToString()); ///TODO BRZYDKIE!!!!!
+            Sequence secondAlignmentSeq = new Sequence(Constants.ALIGNMENT_DNA, parameters.Sequences[1].Name, secondSequenceOfAlignment.ToString());
+            Sequence thirdAlignmentSeq = new Sequence(Constants.ALIGNMENT_DNA, parameters.Sequences[2].Name, thirdSequenceOfAlignment.ToString());
+            computedAlignment = new Alignment(new List<Sequence>(){ firstAlignmentSeq, secondAlignmentSeq, thirdAlignmentSeq });
+            return computedAlignment;
+        }
+
+        private Cube GoOneStepBack(Cube from)
+        {
             string A = parameters.Sequences[0].Value;
             string B = parameters.Sequences[1].Value;
             string C = parameters.Sequences[2].Value;
-            while (!(i == 0 && j == 0 && k == 0))
+            List<int>[] possibleDirectionInArray = Variancy(3);
+
+            Cube newCell = new Cube();
+
+            foreach (List<int> directionVector in possibleDirectionInArray)
             {
-                if (i > 0 && j > 0 && k > 0)
-                    if (alignmentArray[i - 1, j - 1, k - 1] + ComputeAligningValue(A[i - 1], B[j - 1], C[k - 1]) == alignmentArray[i, j, k])
-                    {
-                        answerSeq1 = A[i - 1] + answerSeq1;
-                        answerSeq2 = B[j - 1] + answerSeq2;
-                        answerSeq3 = C[k - 1] + answerSeq3;
-                        i--;
-                        j--;
-                        k--;
-
-                    }
-
-                if (i > 0 && j > 0 && k >= 0)
-                    if (alignmentArray[i - 1, j - 1, k] + ComputeAligningValue(A[i - 1], B[j - 1], '-') == alignmentArray[i, j, k])
-                    {
-                        answerSeq1 = A[i - 1] + answerSeq1;
-                        answerSeq2 = B[j - 1] + answerSeq2;
-                        answerSeq3 = "-" + answerSeq3;
-                        i--;
-                        j--;
-                    }
-
-                if (i > 0 && j >= 0 && k > 0)
-                    if (alignmentArray[i - 1, j, k - 1] + ComputeAligningValue(A[i - 1], '-', C[k - 1]) == alignmentArray[i, j, k])
-                    {
-                        answerSeq1 = A[i - 1] + answerSeq1;
-                        answerSeq2 = "-" + answerSeq2;
-                        answerSeq3 = C[k - 1] + answerSeq3;
-                        i--;
-                        k--;
-                    }
-
-                if (i >= 0 && j > 0 && k > 0)
-                    if (alignmentArray[i, j - 1, k - 1] + ComputeAligningValue('-', B[j - 1], C[k - 1]) == alignmentArray[i, j, k])
-                    {
-                        answerSeq1 = "-" + answerSeq1;
-                        answerSeq2 = B[j - 1] + answerSeq2;
-                        answerSeq3 = C[k - 1] + answerSeq3;
-                        j--;
-                        k--;
-                    }
-                
-                
-                if (i > 0 && j >= 0 && k >= 0)
-                    if (alignmentArray[i - 1, j, k] + ComputeAligningValue(A[i - 1], '-', '-') == alignmentArray[i, j, k])
-                    {
-                        answerSeq1 = A[i - 1] + answerSeq1;
-                        answerSeq2 = "-" + answerSeq2;
-                        answerSeq3 = "-" + answerSeq3;
-                        i--;
-
-                    }
-                
-                if (i >= 0 && j > 0 && k >= 0)
-                    if (alignmentArray[i, j - 1, k] + ComputeAligningValue('-', B[j - 1], '-') == alignmentArray[i, j, k])
-                    {
-                        answerSeq1 = "-" + answerSeq1;
-                        answerSeq2 = B[j - 1] + answerSeq2;
-                        answerSeq3 = "-" + answerSeq3;
-                        j--;
-                    }
-
-                if (i >= 0 && j >= 0 && k > 0)
-                    if (alignmentArray[i, j, k - 1] + ComputeAligningValue('-', '-', C[k - 1]) == alignmentArray[i, j, k])
-                    {
-                        answerSeq1 = "-" + answerSeq1;
-                        answerSeq2 = "-" + answerSeq2;
-                        answerSeq3 = C[k - 1] + answerSeq3;
-                        k--;
-                    }
-
+                int comingFromNeighborCost = ComputeCell(from.rowIndex, from.columnIndex, from.depthIndex, directionVector[0], directionVector[1], directionVector[2]);
+                if (comingFromNeighborCost == from.value)
+                {
+                    char a, b, c;
+                    a = FetchSign(A, from.rowIndex, directionVector[0]);
+                    b = FetchSign(B, from.columnIndex, directionVector[1]);
+                    c = FetchSign(C, from.depthIndex, directionVector[2]);
+                    firstSeqenceOfAlignment.Insert(0, a);
+                    secondSequenceOfAlignment.Insert(0, b);
+                    thirdSequenceOfAlignment.Insert(0, c);
+                    newCell = alignmentCube.GetCell(from.rowIndex - directionVector[0], from.columnIndex - directionVector[1], from.depthIndex - directionVector[2]);
+                    break;
+                }
             }
-            //temporary
-            Sequence s1 = new Sequence(Constants.ALIGNMENT_DNA, parameters.Sequences[0].Name, answerSeq1);
-            Sequence s2 = new Sequence(Constants.ALIGNMENT_DNA, parameters.Sequences[1].Name, answerSeq2);
-            Sequence s3 = new Sequence(Constants.ALIGNMENT_DNA, parameters.Sequences[2].Name, answerSeq3);
-            return new Alignment(new List<Sequence>() { s1,s2,s3 } );
+            return newCell;
         }
+
+
 
 
         public override int GetOptimalAlignmentScore()
         {
             ComputeAlignmentArrayIfNecessary();
-            int i = parameters.Sequences[0].Value.Length;
-            int j = parameters.Sequences[1].Value.Length;
-            int k = parameters.Sequences[2].Value.Length;
-            return alignmentArray[i,j,k];
+            Cube bestScoreCell = alignmentCube.GetCell(alignmentCube.rowSize, alignmentCube.columnSize, alignmentCube.depthSize);
+            int optimalScore = bestScoreCell.value;
+            return optimalScore;
         }
 
         private int Index(int m)
@@ -299,34 +258,37 @@ namespace StringAlgorithms
         public override int GetNumberOfOptimalSolutions()
         {
             ComputeAlignmentArrayIfNecessary();
-            int i = parameters.Sequences[0].Value.Length;
-            int j = parameters.Sequences[1].Value.Length;
-            int k = parameters.Sequences[2].Value.Length;
+            int optimalSolutionsNumber = 0;
 
-            int sum = 0;
-            CountNumberOfOptimalSolutions(i, j, k, ref sum);
-            return sum;
+            Cube startCell = alignmentCube.GetCell(alignmentCube.rowSize, alignmentCube.columnSize, alignmentCube.depthSize);
+
+            optimalSolutionsNumber = CountNumberOfOptimalSolutions(startCell);
+            return optimalSolutionsNumber;
         }
 
-        private void CountNumberOfOptimalSolutions(int i, int j, int k, ref int sum)
+
+        private int CountNumberOfOptimalSolutions(Cube cell)
         {
-            if (i == 0 && j == 0 && k == 0)
+            if (cell.IsTopLeftCell())
             {
-                ++sum;
-                return;
+                return 1;
             }
-            List<int>[] possibleDirections = Variancy(3);
-            foreach (List<int> list in possibleDirections)
+
+            int optimalSolutionsNumber = 0;
+            List<int>[] possibleDirectionInArray = Variancy(3);
+            foreach (List<int> directionVector in possibleDirectionInArray)
             {
-                if (alignmentArray[i, j, k] == ComputeCell(i, j, k, list[0], list[1], list[2]))
+                int comingFromNeighborCost = ComputeCell(cell.rowIndex, cell.columnIndex, cell.depthIndex, directionVector[0], directionVector[1], directionVector[2]);
+                if (comingFromNeighborCost == cell.value)
                 {
-                    CountNumberOfOptimalSolutions(i - list[0], j - list[1], k - list[2], ref sum);
+                    Cube newCell = new Cube();
+                    newCell = alignmentCube.GetCell(cell.rowIndex - directionVector[0], cell.columnIndex - directionVector[1], cell.depthIndex - directionVector[2]);
+                    optimalSolutionsNumber += CountNumberOfOptimalSolutions(newCell);
                 }
             }
+            return optimalSolutionsNumber;
         }
 
-
-        
 
     }
 }

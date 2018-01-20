@@ -39,7 +39,7 @@ namespace StringAlgorithms
             if (this.alignmentArray == null)
             {
                 InitializeAlignmentArray();
-                ComputeAlignmentArray();
+                ComputeAlignmentArray2();
             }
         }
 
@@ -55,6 +55,9 @@ namespace StringAlgorithms
             alignmentArray2.Initialize(alignmentArrayRowNumber, alignmentArrayColumnNumber,0);
             helpArrayP.Initialize(alignmentArrayRowNumber, alignmentArrayColumnNumber,0);
             helpArrayQ.Initialize(alignmentArrayRowNumber, alignmentArrayColumnNumber,0);
+
+            helpArrayP.array.FillRowWithIntValue(0, 0, (x) => int.MaxValue / 2);
+            helpArrayQ.array.FillColumnWithIntValue(0, 0, (x) => int.MaxValue / 2);
         }
 
         protected override void ComputeAlignmentArray()
@@ -71,6 +74,96 @@ namespace StringAlgorithms
                 {
                     ComputeBorderCell(currentCell);
                 }
+            }
+        }
+
+        protected void ComputeAlignmentArray2()
+        {
+            List<int>[] directionsInCube = Variancy(2);
+            CubeIterator alignmentArrayIterator = alignmentArray2.GetIterator();
+            //temporary
+            parameters.Sequences.Add(new Sequence("@", "name", "@"));
+
+            while (alignmentArrayIterator.HasNext())
+            {
+                Cube currentCell = (Cube)alignmentArrayIterator.Next();
+
+
+                List<int> comingFromNeighborsCosts = new List<int>();
+                foreach (List<int> directionVector in directionsInCube)
+                {
+                    comingFromNeighborsCosts.Add(ComputeCell2(currentCell.rowIndex, currentCell.columnIndex, 1, directionVector[0], directionVector[1], 1));
+                }
+                //NOT MIN - COMPAREFUN
+                currentCell.value = MinFromList(comingFromNeighborsCosts);
+                alignmentArray2.SetCell(currentCell);
+            }
+        }
+
+        private int ComputeCell2(int i, int j, int k, int iOffset, int jOffset, int kOffset)
+        {
+            if (i - iOffset >= 0 && j - jOffset >= 0 && k - kOffset >= 0)
+            {
+                string A = parameters.Sequences[0].Value;
+                string B = parameters.Sequences[1].Value;
+                string C = parameters.Sequences[2].Value;
+                char a, b, c;
+                a = FetchSign(A, i, iOffset);
+                b = FetchSign(B, j, jOffset);
+                c = FetchSign(C, k, kOffset);
+
+                Cube newCell = new Cube(i - iOffset, j - jOffset, k - kOffset);
+                int value = ComputeAligningValue(newCell, a, b, c);
+
+                return value;
+            }
+            return GetIlligalValue();
+        }
+
+        private int ComputeAligningValue(Cube cell, char a, char b, char c)
+        {
+            int score = 0;
+            if (a == '-')
+            {
+                score = ComputeCostOfMatchingWithGap(cell, helpArrayQ);
+                Cube cellQ = new Cube(cell.rowIndex, cell.columnIndex + 1, 0, score);
+                helpArrayQ.SetCell(cellQ);
+            }
+            else if (b == '-')
+            {
+                score = ComputeCostOfMatchingWithGap(cell, helpArrayP);
+                Cube cellP = new Cube(cell.rowIndex + 1, cell.columnIndex, 0, score);
+                helpArrayP.SetCell(cellP);
+            }
+            else
+            {
+                score = alignmentArray2.GetCellValue(cell.rowIndex, cell.columnIndex, cell.depthIndex);
+                score += parameters.CostArray.GetLettersAlignmentCost(a, b);
+            }
+            return score;
+        }
+
+        private char FetchSign(string seq, int i, int iOffset)
+        {
+            if (iOffset == 0)
+            {
+                return '-';
+            }
+            return seq[i - iOffset];
+        }
+
+        private int GetIlligalValue()
+        {
+            int a = 1;
+            int b = 0;
+            int c = parameters.Comparefunction(a, b);
+            if (c == 0)
+            {
+                return int.MaxValue / 2;
+            }
+            else
+            {
+                return int.MinValue / 2;
             }
         }
 
@@ -238,12 +331,12 @@ namespace StringAlgorithms
                     ComputeCostOfHavingNGaps(gapLength, from);
                     if (costOfCurrentCell.Equals(verticalGapsCost))
                     {
-                        newCell = alignmentArray2.GetCell(from.rowIndex - gapLength, from.columnIndex);
+                        newCell = alignmentArray2.GetCell(from.rowIndex - gapLength, from.columnIndex,0);
                         break;
                     }
                     else if (costOfCurrentCell.Equals(horizontalGapsCost))
                     {
-                        newCell = alignmentArray2.GetCell(from.rowIndex, from.columnIndex - gapLength);
+                        newCell = alignmentArray2.GetCell(from.rowIndex, from.columnIndex - gapLength,0);
                         break;
                     }
                     ++gapLength;
@@ -338,7 +431,7 @@ namespace StringAlgorithms
         public override int GetOptimalAlignmentScore()
         {        
             ComputeAlignmentArrayIfNecessary();
-            Cube bestScoreCell = alignmentArray2.GetCell(alignmentArray2.rowSize, alignmentArray2.columnSize);
+            Cube bestScoreCell = alignmentArray2.GetCell(alignmentArray2.rowSize, alignmentArray2.columnSize,0);
             int optimalScore = bestScoreCell.value;
             return optimalScore;
         }
@@ -414,5 +507,93 @@ namespace StringAlgorithms
             return optimalSolutionsNumber;
         }
 
+        private Direction GetDirection(List<int> directionVector)
+        {
+            int y = directionVector[0];
+            int x = directionVector[1];
+            if(x == 1 && y == 1)
+            {
+                return Direction.DIAGONAL;
+            }
+            else if( x == 1 && y == 0)
+            {
+                return Direction.LEFT;
+            }
+            else
+            {
+                return Direction.UP;
+            }
+        }
+
+        
+
+        public List<int>[] Variancy(int k)
+        {
+            int i;
+            int[] skok = new int[k + 1];
+            for (i = 1; i <= k; ++i)
+            {
+                skok[i] = 1;
+            }
+
+            int m = 0;
+            i = 0;
+            int[] w = new int[k + 1];
+            List<int>[] ret = new List<int>[(int)Math.Pow(2, k) - 1];
+            for (int it = 0; it < ret.Length; ++it)
+            {
+                ret[it] = new List<int>();
+            }
+            int col = 0;
+            do
+            {
+                ++m;
+                i = Index(m) + 1;
+                if (i <= k)
+                {
+                    w[i] = w[i] + skok[i];
+                    if (w[i] == 0)
+                    {
+                        skok[i] = 1;
+                    }
+                    if (w[i] == 1)
+                    {
+                        skok[i] = -1;
+                    }
+                }
+                else
+                {
+                    return ret;
+                    //w[i - 1] = w[i - 1] + skok[i - 1];
+                }
+                for (int j = 1; j <= k; ++j)
+                {
+                    ret[col].Add(w[j]);
+                }
+                ++col;
+            } while (i <= k);
+            return ret;
+        }
+
+        private int Index(int m)
+        {
+            int i = 0;
+            while (m % 2 == 0)
+            {
+                i++;
+                m = m / 2;
+            }
+            return i;
+        }
+
+        private int MinFromList(List<int> list)
+        {
+            int min = list.First();
+            foreach (int value in list)
+            {
+                min = parameters.Comparefunction(min, value);
+            }
+            return min;
+        }
     }
 }

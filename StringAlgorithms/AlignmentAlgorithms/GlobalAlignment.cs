@@ -62,22 +62,11 @@ namespace StringAlgorithms
             {
                 Cube currentCell = (Cube)alignmentArrayIterator.Next();
 
-                //if (IsBorderCell(currentCell) == false)
-                //{
-                //    ComputeCell(currentCell);
-                //}
-                //else
-                //{
-                //    ComputeGapValue(currentCell);
-                //}
-
-
-                ///////////////////////
 
                 List<int> comingFromNeighborsCosts = new List<int>();
                 foreach (List<int> directionVector in directionsInCube)
                 {
-                    comingFromNeighborsCosts.Add(ComputeCell2(currentCell.rowIndex, currentCell.columnIndex, 1, directionVector[0], directionVector[1], 1));
+                    comingFromNeighborsCosts.Add(ComputeCell(currentCell.rowIndex, currentCell.columnIndex, 1, directionVector[0], directionVector[1], 1));
                 }
                 //NOT MIN - COMPAREFUN
                 currentCell.value = MinFromList(comingFromNeighborsCosts);
@@ -85,9 +74,8 @@ namespace StringAlgorithms
             }
         }
 
-        private int ComputeCell2(int i, int j, int k, int iOffset, int jOffset, int kOffset)
-        {
-            
+        private int ComputeCell(int i, int j, int k, int iOffset, int jOffset, int kOffset)
+        { 
             if (i - iOffset >= 0 && j - jOffset >= 0 && k - kOffset >= 0)
             {
                 string A = parameters.Sequences[0].Value;
@@ -99,7 +87,6 @@ namespace StringAlgorithms
                 c = FetchSign(C, k, kOffset);
 
                 return array.GetCellValue(i - iOffset, j - jOffset, k - kOffset) + ComputeAligningValue(a, b, c);
-
             }
             return GetIlligalValue();
         }
@@ -137,40 +124,6 @@ namespace StringAlgorithms
             return seq[i - iOffset];
         }
 
-        private void ComputeGapValue(Cube cell)
-        {
-            int gapCost = 0; 
-            if(cell.rowIndex == 0)
-            {
-                gapCost = parameters.CostArray.GapCostFun(cell.columnIndex);
-            }
-            else if(cell.columnIndex == 0)
-            {
-                gapCost = parameters.CostArray.GapCostFun(cell.rowIndex);
-            }
-            cell.value = gapCost;
-            array.SetCell(cell);
-        }
-
-        private bool IsBorderCell(Cube cell)
-        {
-            if (cell.rowIndex == 0 || cell.columnIndex == 0)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        private void ComputeCell(Cube cell)
-        {
-            ComputeGoingFromNeighborsCosts(cell);
-            cell.value = GetTheBestComingFromNeigborCost();
-            array.SetCell(cell);
-        }
-
         private void ComputeGoingFromNeighborsCosts(Cube destinationCell)
         {
             fromDiagonalNeighborCost = ComputeCostOfMatching(destinationCell.GetUpDiagonalNeighbor(), AlignmentType.MATCH_SIGNS);
@@ -189,7 +142,7 @@ namespace StringAlgorithms
                 {
                     costOfSignsAlignment = parameters.CostArray.GetLettersAlignmentCost(parameters.Sequences[0].Value[fromCell.rowIndex], parameters.Sequences[1].Value[fromCell.columnIndex]);//slabe
                 }
-                return array.GetCell(fromCell.rowIndex, fromCell.columnIndex).value + costOfSignsAlignment;
+                return array.GetCell(fromCell.rowIndex, fromCell.columnIndex, fromCell.depthIndex).value + costOfSignsAlignment;
             }
             return illegalValue;
         }
@@ -215,15 +168,14 @@ namespace StringAlgorithms
             secondSequenceOfAlignment = new StringBuilder("");
         }
 
+
         private void RetrieveAlignment()
-        {       
-            CubeIterator iterator = array.GetIterator();
-            iterator.SetToCell(new Cube(array.rowSize, array.columnSize,0));
-            Cube currentCell = (Cube)iterator.GetCurrentCell();
+        {
+            Cube currentCell = array.GetCell(array.rowSize, array.columnSize, 0);
 
             while (currentCell.IsTopLeftCell() == false)
             {
-                Cube newCell = GoOneStepBack(currentCell, iterator);
+                Cube newCell = GoOneStepBack(currentCell);
                 Direction direction = GetDirection(currentCell, newCell);
 
                 FetchSignsOfAlignment(newCell.rowIndex, newCell.columnIndex, direction);
@@ -234,27 +186,27 @@ namespace StringAlgorithms
             computedAlignment = new Alignment(firstAlignmentSeq, secondAlignmentSeq);
         }
 
-        private Cube GoOneStepBack(Cube from, CubeIterator iterator)
+        private Cube GoOneStepBack(Cube from)
         {
+            List<int>[] possibleDirectionInArray = Variancy(2);
+            //possibleDirectionInArray[0] = new List<int>() { 1, 1 };
+            //possibleDirectionInArray[1] = new List<int>() { 1, 0 };
+            //possibleDirectionInArray[2] = new List<int>() { 0, 1 };
+
             Cube newCell = new Cube();
 
-            ComputeGoingFromNeighborsCosts(from);
-            int costOfCurrentCell = from.value;
-
-            if (costOfCurrentCell.Equals(fromDiagonalNeighborCost))
+            foreach(List<int> directionVector in possibleDirectionInArray)
             {
-                newCell = (Cube)iterator.Diagonal();
-            }
-            else if (costOfCurrentCell.Equals(fromUpNeighborCost))
-            {
-                newCell = (Cube)iterator.Up();
-            }
-            else if (costOfCurrentCell.Equals(fromLeftNeighborCost))
-            {
-                newCell = (Cube)iterator.Left();
+                int comingFromNeighborCost = ComputeCell(from.rowIndex, from.columnIndex, 1, directionVector[0], directionVector[1], 1);
+                if(comingFromNeighborCost == from.value)
+                {
+                    newCell = array.GetCell(from.rowIndex - directionVector[0], from.columnIndex - directionVector[1],0);
+                    break;
+                }
             }
             return newCell;
         }
+
 
         Direction GetDirection(Cube from, Cube to)
         {
@@ -275,6 +227,8 @@ namespace StringAlgorithms
             }
             return direction;
         }
+
+       
 
         private bool IsTopLeftCellOfAlignmentArray(Cube cell)
         {
@@ -314,7 +268,7 @@ namespace StringAlgorithms
         public override int GetOptimalAlignmentScore()
         {
             ComputeAlignmentArrayIfNecessary();
-            Cube bestScoreCell = array.GetCell(array.rowSize, array.columnSize);
+            Cube bestScoreCell = array.GetCell(array.rowSize, array.columnSize,0);
             int optimalScore = bestScoreCell.value;
             return optimalScore;
         }
@@ -323,58 +277,37 @@ namespace StringAlgorithms
         {
             ComputeAlignmentArrayIfNecessary();
             int optimalSolutionsNumber = 0;
-            CubeIterator iterator = array.GetIterator();
-            iterator.SetToCell(new Cube(array.rowSize, array.columnSize,0));
-            optimalSolutionsNumber = CountNumberOfOptimalSolutions(iterator);
+
+            Cube startCell = array.GetCell(array.rowSize, array.columnSize,0);
+
+            optimalSolutionsNumber = CountNumberOfOptimalSolutions(startCell);
             return optimalSolutionsNumber;
         }
 
-        private int CountNumberOfOptimalSolutions(CubeIterator iterator)
+
+        private int CountNumberOfOptimalSolutions(Cube cell)
         {
-            int optimalSolutionsNumber = 0;
-            Cube cell = (Cube)iterator.GetCurrentCell();
             if (cell.IsTopLeftCell())
             {
                 return 1;
             }
-            
-            int costOfCurrentCell = cell.value;
 
-            if (iterator.HasDiagonal())
+            int optimalSolutionsNumber = 0;
+            List<int>[] possibleDirectionInArray = Variancy(2);
+            foreach (List<int> directionVector in possibleDirectionInArray)
             {
-                ComputeGoingFromNeighborsCosts(cell);
-                if (costOfCurrentCell.Equals(fromDiagonalNeighborCost))
+                int comingFromNeighborCost = ComputeCell(cell.rowIndex, cell.columnIndex, 1, directionVector[0], directionVector[1], 1);
+                if (comingFromNeighborCost == cell.value)
                 {
-                    CubeIterator diagIterator = array.GetIterator();
-                    diagIterator.SetToCell(cell);
-                    diagIterator.Diagonal();
-                    optimalSolutionsNumber += CountNumberOfOptimalSolutions(diagIterator);
-                }
-            }
-            if (iterator.HasUp())
-            {
-                ComputeGoingFromNeighborsCosts(cell);
-                if (costOfCurrentCell.Equals(fromUpNeighborCost))
-                {
-                    CubeIterator upIterator = array.GetIterator();
-                    upIterator.SetToCell(cell);
-                    upIterator.Up();
-                    optimalSolutionsNumber += CountNumberOfOptimalSolutions(upIterator);
-                }
-            }
-            if (iterator.HasLeft())
-            {
-                ComputeGoingFromNeighborsCosts(cell);
-                if (costOfCurrentCell.Equals(fromLeftNeighborCost))
-                {
-                    CubeIterator leftIterator = array.GetIterator();
-                    leftIterator.SetToCell(cell);
-                    leftIterator.Left();
-                    optimalSolutionsNumber += CountNumberOfOptimalSolutions(leftIterator);
+                    Cube newCell = new Cube();
+                    newCell = array.GetCell(cell.rowIndex - directionVector[0], cell.columnIndex - directionVector[1],0);
+                    optimalSolutionsNumber += CountNumberOfOptimalSolutions(newCell);
                 }
             }
             return optimalSolutionsNumber;
         }
+
+       
 
         public List<int>[] Variancy(int k)
         {

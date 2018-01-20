@@ -37,7 +37,7 @@ namespace StringAlgorithms.Utils
 
         public bool IsTopLeftCell()
         {
-            if(this.rowIndex == 0 && this.columnIndex == 0)
+            if(this.rowIndex == 0 && this.columnIndex == 0 && this.depthIndex == 0)
             {
                 return true;
             }
