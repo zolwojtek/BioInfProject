@@ -22,27 +22,7 @@ namespace StringAlgorithms
             Sequences = new List<Sequence>();
         }
 
-        //public string GetSequence(int idx)
-        //{
-        //    --idx;
-        //    try
-        //    {
-        //        return sequences[idx];
-        //    }
-        //    catch 
-        //    {
-        //        throw new Exception(String.Format("There are {0} sequences stored!",sequences.Count()));
-        //    }
-        //}
-        //public List<string> GetSequences()
-        //{
-        //    return sequences;
-        //}
-        //public void SetSequences(List<string> sequences)
-        //{
-        //    this.sequences = sequences;
-        //}
-
+    
         public int GetNumberOfSequences()
         {
             int seqNumber = 0;
