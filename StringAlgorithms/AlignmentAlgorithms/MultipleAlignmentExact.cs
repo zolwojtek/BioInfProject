@@ -21,14 +21,6 @@ namespace StringAlgorithms
             thirdSequenceOfAlignment = new StringBuilder();
         }
 
-        protected override int ComputeAligningValue(char a, char b, char c)
-        {
-            int score = 0;
-            score += parameters.CostArray.GetLettersAlignmentCost(a, b);
-            score += parameters.CostArray.GetLettersAlignmentCost(b, c);
-            score += parameters.CostArray.GetLettersAlignmentCost(a, c);
-            return score;
-        }
 
         protected override void MakeAlignment()
         {

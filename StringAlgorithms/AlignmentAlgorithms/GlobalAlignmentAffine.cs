@@ -15,7 +15,7 @@ namespace StringAlgorithms
         private int fromDiagonalNeighborCost = 0;
         private int fromUpNeighborCost = 0;
         private int fromLeftNeighborCost = 0;
-        private AlignmentCube alignmentArray2;
+
         private AlignmentCube helpArrayP;
         private AlignmentCube helpArrayQ;
 
@@ -28,14 +28,14 @@ namespace StringAlgorithms
 
         protected override void InitializeAlignmentArray()
         {
+            base.InitializeAlignmentArray();
+
             int alignmentArrayRowNumber = parameters.Sequences[0].Value.Length;
             int alignmentArrayColumnNumber = parameters.Sequences[1].Value.Length;
 
-            alignmentArray2 = new AlignmentCube();
             helpArrayP = new AlignmentCube();
             helpArrayQ = new AlignmentCube();
 
-            alignmentArray2.Initialize(alignmentArrayRowNumber, alignmentArrayColumnNumber,0);
             helpArrayP.Initialize(alignmentArrayRowNumber, alignmentArrayColumnNumber,0);
             helpArrayQ.Initialize(alignmentArrayRowNumber, alignmentArrayColumnNumber,0);
 
@@ -43,59 +43,30 @@ namespace StringAlgorithms
             helpArrayQ.array.FillColumnWithIntValue(0, 0, (x) => int.MaxValue / 2);
         }
 
-        protected override void ComputeAlignmentArray()
+
+
+
+
+        private int ComputeCell2(Cube cell, List<int> directionVector)
         {
-            CubeIterator alignmentArrayIterator = alignmentArray2.GetIterator();
-            while (alignmentArrayIterator.HasNext())
-            {
-                Cube currentCell = (Cube)alignmentArrayIterator.Next();
-                if (IsBorderCell(currentCell) == false)
-                {
-                    ComputeCell(currentCell);
-                }
-                else
-                {
-                    ComputeBorderCell(currentCell);
-                }
-            }
-        }
+            int rowIndex = cell.rowIndex;
+            int columnIndex = cell.columnIndex;
+            int depthIndex = (directionVector.Count() == 2) ? 1 : cell.depthIndex;
+            int yOffset = directionVector[0];
+            int xOffset = directionVector[1];
+            int zOffset = (directionVector.Count() == 2) ? 1 : directionVector[2];
 
-        protected void ComputeAlignmentArray2()
-        {
-            List<int>[] directionsInCube = Variancy(2);
-            CubeIterator alignmentArrayIterator = alignmentArray2.GetIterator();
-            //temporary
-            parameters.Sequences.Add(new Sequence("@", "name", "@"));
-
-            while (alignmentArrayIterator.HasNext())
-            {
-                Cube currentCell = (Cube)alignmentArrayIterator.Next();
-
-
-                List<int> comingFromNeighborsCosts = new List<int>();
-                foreach (List<int> directionVector in directionsInCube)
-                {
-                    comingFromNeighborsCosts.Add(ComputeCell2(currentCell.rowIndex, currentCell.columnIndex, 1, directionVector[0], directionVector[1], 1));
-                }
-                //NOT MIN - COMPAREFUN
-                currentCell.value = MinFromList(comingFromNeighborsCosts);
-                alignmentArray2.SetCell(currentCell);
-            }
-        }
-
-        private int ComputeCell2(int i, int j, int k, int iOffset, int jOffset, int kOffset)
-        {
-            if (i - iOffset >= 0 && j - jOffset >= 0 && k - kOffset >= 0)
+            if (rowIndex - yOffset >= 0 && columnIndex - xOffset >= 0 && depthIndex - zOffset >= 0)
             {
                 string A = parameters.Sequences[0].Value;
                 string B = parameters.Sequences[1].Value;
-                string C = parameters.Sequences[2].Value;
+                string C = parameters.Sequences?[2]?.Value ?? "@";
                 char a, b, c;
-                a = FetchSign(A, i, iOffset);
-                b = FetchSign(B, j, jOffset);
-                c = FetchSign(C, k, kOffset);
+                a = FetchSign(A, rowIndex, yOffset);
+                b = FetchSign(B, columnIndex, xOffset);
+                c = FetchSign(C, depthIndex, zOffset);
 
-                Cube newCell = new Cube(i - iOffset, j - jOffset, k - kOffset);
+                Cube newCell = new Cube(rowIndex - yOffset, columnIndex - xOffset, depthIndex - zOffset);
                 int value = ComputeAligningValue(newCell, a, b, c);
 
                 return value;
@@ -103,7 +74,7 @@ namespace StringAlgorithms
             return GetIlligalValue();
         }
 
-        private int ComputeAligningValue(Cube cell, char a, char b, char c)
+        protected override int ComputeAligningValue(Cube cell, char a, char b, char c)
         {
             int score = 0;
             if (a == '-')
@@ -120,20 +91,13 @@ namespace StringAlgorithms
             }
             else
             {
-                score = alignmentArray2.GetCellValue(cell.rowIndex, cell.columnIndex, cell.depthIndex);
+                score = array.GetCellValue(cell.rowIndex, cell.columnIndex, cell.depthIndex);
                 score += parameters.CostArray.GetLettersAlignmentCost(a, b);
             }
             return score;
         }
 
-        protected override char FetchSign(string seq, int i, int iOffset)
-        {
-            if (iOffset == 0)
-            {
-                return '-';
-            }
-            return seq[i - iOffset];
-        }
+
 
         private int GetIlligalValue()
         {
@@ -150,41 +114,7 @@ namespace StringAlgorithms
             }
         }
 
-        private void ComputeBorderCell(Cube cell)
-        {
-            int gapCost = 0;
-            Cube cellP = new Cube();
-            Cube cellQ = new Cube();
 
-            if (cell.rowIndex == 0)
-            {
-                gapCost = parameters.CostArray.GapCostFun(cell.columnIndex);
-                cellP = new Cube(cell.rowIndex, cell.columnIndex, 0, int.MaxValue / 2);
-                cellQ = new Cube(cell.rowIndex, cell.columnIndex, 0, 0);
-            }
-            else if (cell.columnIndex == 0)
-            {
-                gapCost = parameters.CostArray.GapCostFun(cell.rowIndex);
-                cellP = new Cube(cell.rowIndex, cell.columnIndex, 0, 0);
-                cellQ = new Cube(cell.rowIndex, cell.columnIndex, 0, int.MaxValue / 2);
-            }
-            cell.value = gapCost;
-            alignmentArray2.SetCell(cell);
-            helpArrayP.SetCell(cellP);
-            helpArrayQ.SetCell(cellQ);
-        }
-
-        private bool IsBorderCell(Cube cell)
-        {
-            if (cell.rowIndex == 0 || cell.columnIndex == 0)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
 
         private void ComputeCell(Cube cell)
         {
@@ -193,7 +123,7 @@ namespace StringAlgorithms
 
             ComputeGoingFromNeighborsCosts(cell);
             cell.value = GetTheBestComingFromNeigborCost();
-            alignmentArray2.SetCell(cell);
+            array.SetCell(cell);
 
             Cube cellP = new Cube(cellRow, celColumn,0, fromUpNeighborCost);
             Cube cellQ = new Cube(cellRow, celColumn,0, fromLeftNeighborCost);
@@ -226,7 +156,7 @@ namespace StringAlgorithms
         {
             int cellRow = cell.rowIndex;
             int cellColumn = cell.columnIndex;
-            int gapStartingCost = alignmentArray2.GetCellValue(cellRow, cellColumn, cell.depthIndex) + parameters.CostArray.GetGapStartingCost();
+            int gapStartingCost = array.GetCellValue(cellRow, cellColumn, cell.depthIndex) + parameters.CostArray.GetGapStartingCost();
             int gapExtensionCost = helpArray.GetCellValue(cellRow, cellColumn, cell.depthIndex) + parameters.CostArray.GetGapExtensionCost();
             return parameters.Comparefunction(gapStartingCost, gapExtensionCost);
         }
@@ -235,7 +165,7 @@ namespace StringAlgorithms
         {
             int cellRow = cell.rowIndex;
             int cellColumn = cell.columnIndex;
-            int cost = alignmentArray2.GetCellValue(cellRow, cellColumn, cell.depthIndex) + parameters.CostArray.GetLettersAlignmentCost(parameters.Sequences[0].Value[cellRow], parameters.Sequences[1].Value[cellColumn]);
+            int cost = array.GetCellValue(cellRow, cellColumn, cell.depthIndex) + parameters.CostArray.GetLettersAlignmentCost(parameters.Sequences[0].Value[cellRow], parameters.Sequences[1].Value[cellColumn]);
             return cost;
         }
 
@@ -249,8 +179,8 @@ namespace StringAlgorithms
 
         protected override void RetrieveAlignment()
         {
-            CubeIterator iterator = alignmentArray2.GetIterator();
-            iterator.SetToCell(new Cube(alignmentArray2.rowSize, alignmentArray2.columnSize,0));
+            CubeIterator iterator = array.GetIterator();
+            iterator.SetToCell(new Cube(array.rowSize, array.columnSize,0));
             Cube currentCell = (Cube)iterator.GetCurrentCell();
 
             while (currentCell.IsTopLeftCell() == false)
@@ -301,12 +231,12 @@ namespace StringAlgorithms
                     ComputeCostOfHavingNGaps(gapLength, from);
                     if (costOfCurrentCell.Equals(verticalGapsCost))
                     {
-                        newCell = alignmentArray2.GetCell(from.rowIndex - gapLength, from.columnIndex,0);
+                        newCell = array.GetCell(from.rowIndex - gapLength, from.columnIndex,0);
                         break;
                     }
                     else if (costOfCurrentCell.Equals(horizontalGapsCost))
                     {
-                        newCell = alignmentArray2.GetCell(from.rowIndex, from.columnIndex - gapLength,0);
+                        newCell = array.GetCell(from.rowIndex, from.columnIndex - gapLength,0);
                         break;
                     }
                     ++gapLength;
@@ -321,7 +251,7 @@ namespace StringAlgorithms
             int nGapCost = parameters.CostArray.GapCostFun(gapLength);
             if (from.columnIndex - gapLength >= 0)
             {
-                horizontalGapsCost = alignmentArray2.GetCellValue(from.rowIndex, from.columnIndex - gapLength, from.depthIndex) + nGapCost;
+                horizontalGapsCost = array.GetCellValue(from.rowIndex, from.columnIndex - gapLength, from.depthIndex) + nGapCost;
             }
             else
             {
@@ -329,7 +259,7 @@ namespace StringAlgorithms
             }
             if (from.rowIndex - gapLength >= 0)
             {
-                verticalGapsCost = alignmentArray2.GetCellValue(from.rowIndex - gapLength, from.columnIndex, from.depthIndex) + nGapCost;
+                verticalGapsCost = array.GetCellValue(from.rowIndex - gapLength, from.columnIndex, from.depthIndex) + nGapCost;
             }
             else
             {
@@ -401,7 +331,7 @@ namespace StringAlgorithms
         public override int GetOptimalAlignmentScore()
         {        
             ComputeAlignmentArrayIfNecessary();
-            Cube bestScoreCell = alignmentArray2.GetCell(alignmentArray2.rowSize, alignmentArray2.columnSize,0);
+            Cube bestScoreCell = array.GetCell(array.rowSize, array.columnSize,0);
             int optimalScore = bestScoreCell.value;
             return optimalScore;
         }
@@ -410,8 +340,8 @@ namespace StringAlgorithms
         {
             ComputeAlignmentArrayIfNecessary();
             int optimalSolutionsNumber = 0;
-            CubeIterator iterator = alignmentArray2.GetIterator();
-            iterator.SetToCell(new Cube(alignmentArray2.rowSize, alignmentArray2.columnSize,0));
+            CubeIterator iterator = array.GetIterator();
+            iterator.SetToCell(new Cube(array.rowSize, array.columnSize,0));
             optimalSolutionsNumber = CountNumberOfOptimalSolutions(iterator);
             return optimalSolutionsNumber;
         }
@@ -433,15 +363,15 @@ namespace StringAlgorithms
                 int costDiag = ComputeCostOfMatchingSigns(cell.GetUpDiagonalNeighbor());
                 if (costOfCurrentCell.Equals(costDiag))
                 {
-                    CubeIterator diagIterator = alignmentArray2.GetIterator();
+                    CubeIterator diagIterator = array.GetIterator();
                     diagIterator.SetToCell(cell);
                     diagIterator.Diagonal();
                     optimalSolutionsNumber += CountNumberOfOptimalSolutions(diagIterator);
                 }
             }
 
-            CubeIterator upIterator = alignmentArray2.GetIterator();
-            CubeIterator leftIterator = alignmentArray2.GetIterator();
+            CubeIterator upIterator = array.GetIterator();
+            CubeIterator leftIterator = array.GetIterator();
             upIterator.SetToCell(cell);
             leftIterator.SetToCell(cell);
             int k = 1;

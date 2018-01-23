@@ -12,22 +12,13 @@ namespace StringAlgorithms
 {
     public class GlobalAlignment : TextAlignmentAlgorithm
     {
-        private const int illegalValue = Int32.MinValue;
         
 
         public GlobalAlignment(TextAlignmentParameters parameters) : base(parameters)
         {
-           
+            illegalValue = Int32.MinValue;
         }
 
-        protected override int ComputeAligningValue(char a, char b, char c)
-        {
-            int score = 0;
-            score += parameters.CostArray.GetLettersAlignmentCost(a, b);
-            score += parameters.CostArray.GetLettersAlignmentCost(b, c);
-            score += parameters.CostArray.GetLettersAlignmentCost(a, c);
-            return score;
-        }
 
         protected override void MakeAlignment()
         {

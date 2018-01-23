@@ -28,6 +28,7 @@ namespace StringAlgorithms
                 SetAllComputableElementsToNull();
             }
         }
+        protected int illegalValue;
 
         private void SetAllComputableElementsToNull()
         {
@@ -77,7 +78,6 @@ namespace StringAlgorithms
             int alignmentArrayDepthNumber = parameters.Sequences?[2]?.Value.Length ?? 0;
             array = new AlignmentCube();
             array.Initialize(alignmentArrayRowNumber, alignmentArrayColumnNumber, alignmentArrayDepthNumber);
-
         }
 
         protected virtual void ComputeAlignmentArray()
@@ -189,14 +189,19 @@ namespace StringAlgorithms
                 b = FetchSign(B, columnIndex, xOffset);
                 c = FetchSign(C, depthIndex, zOffset);
 
-                return array.GetCellValue(rowIndex - yOffset, columnIndex - xOffset, depthIndex - zOffset) + ComputeAligningValue(a, b, c);
+                Cube newCell = new Cube(rowIndex - yOffset, columnIndex - xOffset, depthIndex - zOffset);
+                return ComputeAligningValue(newCell, a, b, c);
             }
             return parameters.GetIlligalValue();
         }
 
-        protected virtual int ComputeAligningValue(char a, char b, char c)
+        protected virtual int ComputeAligningValue(Cube cell, char a, char b, char c)
         {
-            return 0;
+            int score = array.GetCellValue(cell.rowIndex, cell.columnIndex, cell.depthIndex);
+            score += parameters.CostArray.GetLettersAlignmentCost(a, b);
+            score += parameters.CostArray.GetLettersAlignmentCost(b, c);
+            score += parameters.CostArray.GetLettersAlignmentCost(a, c);
+            return score;
         }
 
         protected virtual char FetchSign(string seq, int i, int iOffset)

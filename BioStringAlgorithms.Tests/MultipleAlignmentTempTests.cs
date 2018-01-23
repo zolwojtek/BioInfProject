@@ -139,7 +139,7 @@ namespace BioStringAlgotihms.Tests
         }
 
         [Test]
-        //[Ignore("")]
+        [Ignore("")]
         public void CountAlignmentScore_AreTheScoresCorrectForExamplesFovideInFiles()
         {
             List<int> countedScores = new List<int>();
