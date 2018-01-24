@@ -12,10 +12,6 @@ namespace StringAlgorithms
     {
         private int verticalGapsCost;
         private int horizontalGapsCost;
-        private int fromDiagonalNeighborCost = 0;
-        private int fromUpNeighborCost = 0;
-        private int fromLeftNeighborCost = 0;
-
         private AlignmentCube helpArrayP;
         private AlignmentCube helpArrayQ;
 
@@ -23,8 +19,6 @@ namespace StringAlgorithms
         {
 
         }
-
-
 
         protected override void InitializeAlignmentArray()
         {
@@ -41,37 +35,6 @@ namespace StringAlgorithms
 
             helpArrayP.array.FillRowWithIntValue(0, 0, (x) => int.MaxValue / 2);
             helpArrayQ.array.FillColumnWithIntValue(0, 0, (x) => int.MaxValue / 2);
-        }
-
-
-
-
-
-        private int ComputeCell2(Cube cell, List<int> directionVector)
-        {
-            int rowIndex = cell.rowIndex;
-            int columnIndex = cell.columnIndex;
-            int depthIndex = (directionVector.Count() == 2) ? 1 : cell.depthIndex;
-            int yOffset = directionVector[0];
-            int xOffset = directionVector[1];
-            int zOffset = (directionVector.Count() == 2) ? 1 : directionVector[2];
-
-            if (rowIndex - yOffset >= 0 && columnIndex - xOffset >= 0 && depthIndex - zOffset >= 0)
-            {
-                string A = parameters.Sequences[0].Value;
-                string B = parameters.Sequences[1].Value;
-                string C = parameters.Sequences?[2]?.Value ?? "@";
-                char a, b, c;
-                a = FetchSign(A, rowIndex, yOffset);
-                b = FetchSign(B, columnIndex, xOffset);
-                c = FetchSign(C, depthIndex, zOffset);
-
-                Cube newCell = new Cube(rowIndex - yOffset, columnIndex - xOffset, depthIndex - zOffset);
-                int value = ComputeAligningValue(newCell, a, b, c);
-
-                return value;
-            }
-            return GetIlligalValue();
         }
 
         protected override int ComputeAligningValue(Cube cell, char a, char b, char c)
@@ -97,8 +60,6 @@ namespace StringAlgorithms
             return score;
         }
 
-
-
         private int GetIlligalValue()
         {
             int a = 1;
@@ -112,44 +73,6 @@ namespace StringAlgorithms
             {
                 return int.MinValue / 2;
             }
-        }
-
-
-
-        private void ComputeCell(Cube cell)
-        {
-            int cellRow = cell.rowIndex;
-            int celColumn = cell.columnIndex;
-
-            ComputeGoingFromNeighborsCosts(cell);
-            cell.value = GetTheBestComingFromNeigborCost();
-            array.SetCell(cell);
-
-            Cube cellP = new Cube(cellRow, celColumn,0, fromUpNeighborCost);
-            Cube cellQ = new Cube(cellRow, celColumn,0, fromLeftNeighborCost);
-            helpArrayP.SetCell(cellP);
-            helpArrayQ.SetCell(cellQ);
-        }
-
-        private void ComputeGoingFromNeighborsCosts(Cube destinationCell)
-        {
-            fromUpNeighborCost = ComputeCostOfMatching(destinationCell.GetUpNeighbor(), helpArrayP, AlignmentType.MATCH_WITH_GAP);
-            fromLeftNeighborCost = ComputeCostOfMatching(destinationCell.GetLeftNeighbor(), helpArrayQ, AlignmentType.MATCH_WITH_GAP);
-            fromDiagonalNeighborCost = ComputeCostOfMatching(destinationCell.GetUpDiagonalNeighbor(), null, AlignmentType.MATCH_SIGNS);
-        }
-
-        private int ComputeCostOfMatching(Cube cell, AlignmentCube helpArray, AlignmentType alignmentType)
-        {
-            int cost = 0;
-            if (alignmentType == AlignmentType.MATCH_WITH_GAP)
-            {
-                cost = ComputeCostOfMatchingWithGap(cell, helpArray);
-            }
-            else if (alignmentType == AlignmentType.MATCH_SIGNS)
-            {
-                cost = ComputeCostOfMatchingSigns(cell);
-            }
-            return cost;
         }
 
         private int ComputeCostOfMatchingWithGap(Cube cell, AlignmentCube helpArray)
@@ -169,51 +92,7 @@ namespace StringAlgorithms
             return cost;
         }
 
-        private int GetTheBestComingFromNeigborCost()
-        {
-            int bestCost = parameters.Comparefunction(fromDiagonalNeighborCost, parameters.Comparefunction(fromUpNeighborCost, fromLeftNeighborCost));
-            return bestCost;
-        }
-
-
-
-        protected override void RetrieveAlignment()
-        {
-            CubeIterator iterator = array.GetIterator();
-            iterator.SetToCell(new Cube(array.rowSize, array.columnSize,0));
-            Cube currentCell = (Cube)iterator.GetCurrentCell();
-
-            while (currentCell.IsTopLeftCell() == false)
-            {
-                Cube newCell = GoOneStepBack(currentCell, iterator);
-                Direction direction = GetDirection(currentCell, newCell);
-
-                
-                if(direction == Direction.DIAGONAL)
-                {
-                    FetchSignsOfAlignment(newCell.rowIndex, newCell.columnIndex, direction);
-                }
-                else 
-                {
-                    int gapLength = 1;
-                    if (direction == Direction.LEFT)
-                    {
-                        gapLength = currentCell.columnIndex - newCell.columnIndex;
-                    }
-                    else if (direction == Direction.UP)
-                    {
-                        gapLength = currentCell.rowIndex - newCell.rowIndex;
-                    }
-                    FetchSeqeunceOfGapsInAlignment(gapLength, newCell, direction);
-                }
-                currentCell = newCell;
-            }
-            Sequence firstAlignmentSeq = new Sequence(Constants.ALIGNMENT_DNA, parameters.Sequences[0].Name, firstSeqenceOfAlignment.ToString());// answerSeq1);
-            Sequence secondAlignmentSeq = new Sequence(Constants.ALIGNMENT_DNA, parameters.Sequences[1].Name, secondSequenceOfAlignment.ToString());// answerSeq2);
-            computedAlignment = new Alignment(firstAlignmentSeq, secondAlignmentSeq);
-        }
-
-        private Cube GoOneStepBack(Cube from, CubeIterator iterator)
+        protected override Cube GoOneStepBack(Cube from)
         {
             Cube newCell;
             int diagonalCost = ComputeCostOfMatchingSigns(from.GetUpDiagonalNeighbor());
@@ -221,7 +100,8 @@ namespace StringAlgorithms
 
             if (costOfCurrentCell.Equals(diagonalCost))
             {
-                newCell = (Cube)iterator.Diagonal();
+                newCell = array.GetCell(from.rowIndex - 1, from.columnIndex - 1, from.depthIndex);
+                FetchSignsOfAlignment(newCell.rowIndex, newCell.columnIndex, Direction.DIAGONAL);
             }
             else
             {
@@ -232,18 +112,26 @@ namespace StringAlgorithms
                     if (costOfCurrentCell.Equals(verticalGapsCost))
                     {
                         newCell = array.GetCell(from.rowIndex - gapLength, from.columnIndex,0);
+                        FetchSeqeunceOfGapsInAlignment(gapLength, newCell, Direction.UP);
                         break;
                     }
                     else if (costOfCurrentCell.Equals(horizontalGapsCost))
                     {
                         newCell = array.GetCell(from.rowIndex, from.columnIndex - gapLength,0);
+                        FetchSeqeunceOfGapsInAlignment(gapLength, newCell, Direction.LEFT);
                         break;
                     }
                     ++gapLength;
                 }
-                iterator.SetToCell(newCell);
             }
             return newCell;
+        }
+
+        protected override void MakeAlignment()
+        {
+            Sequence firstAlignmentSeq = new Sequence(Constants.ALIGNMENT_DNA, parameters.Sequences[0].Name, firstSeqenceOfAlignment.ToString()); ///TODO BRZYDKIE!!!!!
+            Sequence secondAlignmentSeq = new Sequence(Constants.ALIGNMENT_DNA, parameters.Sequences[1].Name, secondSequenceOfAlignment.ToString());
+            computedAlignment = new Alignment(firstAlignmentSeq, secondAlignmentSeq);
         }
 
         private void ComputeCostOfHavingNGaps(int gapLength, Cube from)
@@ -265,26 +153,6 @@ namespace StringAlgorithms
             {
                 verticalGapsCost = int.MaxValue / 2;
             }
-        }
-
-        Direction GetDirection(Cube from, Cube to)
-        {
-            int verticalDiff = from.rowIndex - to.rowIndex;
-            int horizontalDiff = from.columnIndex - to.columnIndex;
-            Direction direction;
-            if (verticalDiff != 0 && horizontalDiff != 0)
-            {
-                direction = Direction.DIAGONAL;
-            }
-            else if (verticalDiff != 0)
-            {
-                direction = Direction.UP;
-            }
-            else
-            {
-                direction = Direction.LEFT;
-            }
-            return direction;
         }
 
         private void FetchSignsOfAlignment(int indexInFirstSequence, int indexInSecondSequence, Direction direction)
@@ -326,14 +194,6 @@ namespace StringAlgorithms
                 }
                 FetchSignsOfAlignment(fetchedCellRow, fetchedCellcolumn, direction);
             }
-        }
-
-        public override int GetOptimalAlignmentScore()
-        {        
-            ComputeAlignmentArrayIfNecessary();
-            Cube bestScoreCell = array.GetCell(array.rowSize, array.columnSize,0);
-            int optimalScore = bestScoreCell.value;
-            return optimalScore;
         }
 
         public override int GetNumberOfOptimalSolutions()
@@ -407,34 +267,10 @@ namespace StringAlgorithms
             return optimalSolutionsNumber;
         }
 
-        private Direction GetDirection(List<int> directionVector)
-        {
-            int y = directionVector[0];
-            int x = directionVector[1];
-            if(x == 1 && y == 1)
-            {
-                return Direction.DIAGONAL;
-            }
-            else if( x == 1 && y == 0)
-            {
-                return Direction.LEFT;
-            }
-            else
-            {
-                return Direction.UP;
-            }
-        }
-
-
-
         protected override void AddNextSignsOfAlignment(char a, char b, char c)
         {
             throw new NotImplementedException();
         }
 
-        protected override void MakeAlignment()
-        {
-            throw new NotImplementedException();
-        }
     }
 }
