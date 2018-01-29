@@ -20,17 +20,7 @@ namespace StringAlgorithms
         }
 
 
-        protected override void MakeAlignment()
-        {
-            Sequence firstAlignmentSeq = new Sequence(Constants.ALIGNMENT_DNA, parameters.Sequences[0].Name, firstSeqenceOfAlignment.ToString()); ///TODO BRZYDKIE!!!!!
-            Sequence secondAlignmentSeq = new Sequence(Constants.ALIGNMENT_DNA, parameters.Sequences[1].Name, secondSequenceOfAlignment.ToString());
-            computedAlignment = new Alignment(firstAlignmentSeq, secondAlignmentSeq);
-        }
 
-        protected override void AddNextSignsOfAlignment(char a, char b, char c)
-        {
-            firstSeqenceOfAlignment.Insert(0, a);
-            secondSequenceOfAlignment.Insert(0, b);
-        }
+
     }
 }

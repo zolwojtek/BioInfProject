@@ -52,6 +52,20 @@ namespace StringAlgorithms
             }
         }
 
+        public List<int> GetDimensionSizes()
+        {
+            List<int> dimensionSizes = new List<int>();
+
+            foreach(Sequence seq in Sequences)
+            {
+                dimensionSizes.Add(seq.Value.Length);
+            }
+            if(GetNumberOfSequences() == 2)
+            {
+                dimensionSizes.Add(0);
+            }
+            return dimensionSizes;
+        }
 
     }
 }

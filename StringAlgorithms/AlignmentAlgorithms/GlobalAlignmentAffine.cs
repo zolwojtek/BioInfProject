@@ -30,10 +30,11 @@ namespace StringAlgorithms
             helpArrayP = new AlignmentCube();
             helpArrayQ = new AlignmentCube();
 
-            helpArrayP.Initialize(alignmentArrayRowNumber, alignmentArrayColumnNumber,0);
-            helpArrayQ.Initialize(alignmentArrayRowNumber, alignmentArrayColumnNumber,0);
+            List<int> dimensionSizes = parameters.GetDimensionSizes();
+            helpArrayP.Initialize(dimensionSizes);
+            helpArrayQ.Initialize(dimensionSizes);
 
-            helpArrayP.array.FillRowWithIntValue(0, 0, (x) => int.MaxValue / 2);
+            helpArrayP.array.FillRowWithIntValue(0, 0, (x) => int.MaxValue / 2); //nie powinniśmy z zewnątrz wykonywać operacji bezpośrednio na wewnętrznej skladowej innej klasy TODO
             helpArrayQ.array.FillColumnWithIntValue(0, 0, (x) => int.MaxValue / 2);
         }
 
@@ -60,20 +61,6 @@ namespace StringAlgorithms
             return score;
         }
 
-        private int GetIlligalValue()
-        {
-            int a = 1;
-            int b = 0;
-            int c = parameters.Comparefunction(a, b);
-            if (c == 0)
-            {
-                return int.MaxValue / 2;
-            }
-            else
-            {
-                return int.MinValue / 2;
-            }
-        }
 
         private int ComputeCostOfMatchingWithGap(Cube cell, AlignmentCube helpArray)
         {
@@ -91,6 +78,8 @@ namespace StringAlgorithms
             int cost = array.GetCellValue(cellRow, cellColumn, cell.depthIndex) + parameters.CostArray.GetLettersAlignmentCost(parameters.Sequences[0].Value[cellRow], parameters.Sequences[1].Value[cellColumn]);
             return cost;
         }
+
+        
 
         protected override Cube GoOneStepBack(Cube from)
         {
@@ -127,12 +116,7 @@ namespace StringAlgorithms
             return newCell;
         }
 
-        protected override void MakeAlignment()
-        {
-            Sequence firstAlignmentSeq = new Sequence(Constants.ALIGNMENT_DNA, parameters.Sequences[0].Name, firstSeqenceOfAlignment.ToString()); ///TODO BRZYDKIE!!!!!
-            Sequence secondAlignmentSeq = new Sequence(Constants.ALIGNMENT_DNA, parameters.Sequences[1].Name, secondSequenceOfAlignment.ToString());
-            computedAlignment = new Alignment(firstAlignmentSeq, secondAlignmentSeq);
-        }
+
 
         private void ComputeCostOfHavingNGaps(int gapLength, Cube from)
         {
@@ -174,8 +158,8 @@ namespace StringAlgorithms
                     signSecond = '-';
                     break;
             }
-            firstSeqenceOfAlignment.Insert(0, signFirst);
-            secondSequenceOfAlignment.Insert(0, signSecond);
+            alignmentStringsBuilders[0].Insert(0, signFirst);
+            alignmentStringsBuilders[1].Insert(0, signSecond);
         }
 
         private void FetchSeqeunceOfGapsInAlignment(int gapLength, Cube startingCell, Direction direction)

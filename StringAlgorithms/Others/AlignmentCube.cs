@@ -40,14 +40,14 @@ namespace StringAlgorithms.Utils
             }
         }
 
-        public void Initialize(int lastRowIndex, int lastColumnIndex, int lastDepthIndex)
+        public void Initialize(List<int> dimensionSizes)
         {
             //+1 because of index 0
-            array = new int[lastRowIndex + 1, lastColumnIndex + 1, lastDepthIndex + 1];
+            array = new int[dimensionSizes[0] + 1, dimensionSizes[1] + 1, dimensionSizes[2] + 1];
 
-            this.rowSize = lastRowIndex;
-            this.columnSize = lastColumnIndex;
-            this.depthSize = lastDepthIndex;
+            this.rowSize = dimensionSizes[0];
+            this.columnSize = dimensionSizes[1];
+            this.depthSize = dimensionSizes[2];
         }
 
         public void Initialize(int[,,] matrix)

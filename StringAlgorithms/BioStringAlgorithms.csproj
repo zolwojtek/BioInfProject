@@ -75,6 +75,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AlignmentAlgorithms\Graph.cs" />
+    <Compile Include="Others\Utils.cs" />
     <Content Include="AlignmentAlgorithms\GraphBAK.txt" />
     <Compile Include="AlignmentAlgorithms\MultipleAlignmentExact.cs" />
     <Compile Include="Enums\AlignmentTypeEnum.cs" />
@@ -84,20 +85,20 @@
     <Compile Include="Enums\Directions.cs" />
     <Compile Include="Enums\FunctionTypeEnum.cs" />
     <Compile Include="MultipleAlignmentTemp.cs" />
-    <Compile Include="Utils\Alignment.cs" />
-    <Compile Include="Utils\AlignmentCube.cs" />
-    <Compile Include="Utils\Cube.cs" />
-    <Compile Include="Utils\Constants.cs" />
-    <Compile Include="Utils\CubeIterator.cs" />
-    <Compile Include="Utils\MatrixExtensions.cs" />
-    <Compile Include="Utils\ObjectExtension.cs" />
-    <Compile Include="Utils\LetterAlignmentCostManager.cs" />
+    <Compile Include="Others\Alignment.cs" />
+    <Compile Include="Others\AlignmentCube.cs" />
+    <Compile Include="Others\Cube.cs" />
+    <Compile Include="Others\Constants.cs" />
+    <Compile Include="Others\CubeIterator.cs" />
+    <Compile Include="Others\MatrixExtensions.cs" />
+    <Compile Include="Others\ObjectExtension.cs" />
+    <Compile Include="Others\LetterAlignmentCostManager.cs" />
     <Compile Include="AlignmentAlgorithms\TextAlignmentAlgorithm.cs" />
     <Compile Include="AlignmentAlgorithms\GlobalAlignment.cs" />
     <Compile Include="AlignmentAlgorithms\TextAlignmentParameters.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utils\Sequence.cs" />
-    <Compile Include="Utils\StringExtensions.cs" />
+    <Compile Include="Others\Sequence.cs" />
+    <Compile Include="Others\StringExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
