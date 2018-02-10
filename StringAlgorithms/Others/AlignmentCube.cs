@@ -89,6 +89,12 @@ namespace StringAlgorithms.Utils
             return cell;
         }
 
+        public Cube GetCell(Cube cell)
+        {
+            Cube newCell = new Cube(cell.rowIndex, cell.columnIndex, cell.depthIndex, array[cell.rowIndex, cell.columnIndex, cell.depthIndex]);
+            return newCell;
+        }
+
         public int GetCellValue(int row, int column, int depth)
         {
             return array[row, column, depth];

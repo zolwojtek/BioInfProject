@@ -180,11 +180,6 @@ namespace StringAlgorithms
             throw new NotImplementedException();
         }
 
-        protected override void AddNextSignsOfAlignment(char a, char b, char c)
-        {
-            throw new NotImplementedException();
-        }
-
         protected override void MakeAlignment()
         {
             throw new NotImplementedException();

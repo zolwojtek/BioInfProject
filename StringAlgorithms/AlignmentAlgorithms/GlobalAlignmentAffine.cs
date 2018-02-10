@@ -38,16 +38,16 @@ namespace StringAlgorithms
             helpArrayQ.array.FillColumnWithIntValue(0, 0, (x) => int.MaxValue / 2);
         }
 
-        protected override int ComputeAligningValue(Cube cell, char a, char b, char c)
+        protected override int ComputeAligningValue(Cube cell, List<char> signsToALign)
         {
             int score = 0;
-            if (a == '-')
+            if (signsToALign[0] == '-')
             {
                 score = ComputeCostOfMatchingWithGap(cell, helpArrayQ);
                 Cube cellQ = new Cube(cell.rowIndex, cell.columnIndex + 1, 0, score);
                 helpArrayQ.SetCell(cellQ);
             }
-            else if (b == '-')
+            else if (signsToALign[1] == '-')
             {
                 score = ComputeCostOfMatchingWithGap(cell, helpArrayP);
                 Cube cellP = new Cube(cell.rowIndex + 1, cell.columnIndex, 0, score);
@@ -56,7 +56,7 @@ namespace StringAlgorithms
             else
             {
                 score = array.GetCellValue(cell.rowIndex, cell.columnIndex, cell.depthIndex);
-                score += parameters.CostArray.GetLettersAlignmentCost(a, b);
+                score += parameters.CostArray.GetLettersAlignmentCost(signsToALign[0], signsToALign[1]);
             }
             return score;
         }
@@ -251,7 +251,7 @@ namespace StringAlgorithms
             return optimalSolutionsNumber;
         }
 
-        protected override void AddNextSignsOfAlignment(char a, char b, char c)
+        private void AddNextSignsOfAlignment(char a, char b, char c)
         {
             throw new NotImplementedException();
         }

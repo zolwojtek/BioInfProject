@@ -67,5 +67,17 @@ namespace StringAlgorithms
             return dimensionSizes;
         }
 
+        public string GetSequenceValue(int seqNum)
+        {
+            try
+            {
+                return Sequences[seqNum].Value;
+            }
+            catch
+            {
+                return string.Empty;
+            }
+        }
+
     }
 }

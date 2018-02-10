@@ -80,48 +80,93 @@ namespace StringAlgorithms
         protected virtual void ComputeCell(Cube cell)
         {
             List<int>[] directionsInCube = Utils.Utils.Variancy(parameters.GetNumberOfSequences());//clean up the mess with namespaces names TODO
+            
             List<int> possibleScores = new List<int>();
             foreach (List<int> directionVector in directionsInCube)
             {
-                int comingFrinNeighborScore = ComputeScore(cell, directionVector);
-                possibleScores.Add(comingFrinNeighborScore);
+                AddZDimensionIfNecessary(directionVector);
+                int comingFriomNeighborScore = ComputeScore(cell, directionVector);
+                possibleScores.Add(comingFriomNeighborScore);
             }
            cell.value = GetTheBestValue(possibleScores);
            array.SetCell(cell);
         }
 
+        private void AddZDimensionIfNecessary(List<int> directionVector)
+        {
+            if(directionVector.Count() == 2)
+            {
+                directionVector.Add(0);
+            }
+        }
 
-
-
-
-
-
-
-
+        private Cube GetCellPointedByVector(Cube origin, List<int> directionVector)
+        {
+            Cube newCell = new Cube
+            {
+                rowIndex = origin.rowIndex - directionVector[0],
+                columnIndex = origin.columnIndex - directionVector[1],
+                depthIndex = origin.depthIndex - directionVector[2]
+            };
+            //newCell.value = array.GetCellValue(newCell.rowIndex, newCell.columnIndex, newCell.depthIndex);
+            return newCell;
+        }
 
         protected virtual int ComputeScore(Cube cell, List<int> directionVector)
-        {
-            int rowIndex = cell.rowIndex;
-            int columnIndex = cell.columnIndex;
-            int depthIndex = (directionVector.Count() == 2) ? 1 : cell.depthIndex;
-            int yOffset = directionVector[0];
-            int xOffset = directionVector[1];
-            int zOffset = (directionVector.Count() == 2) ? 1 : directionVector[2];
+        { 
+            Cube newCell = GetCellPointedByVector(cell, directionVector);
 
-            if (rowIndex - yOffset >= 0 && columnIndex - xOffset >= 0 && depthIndex - zOffset >= 0)
+            if (newCell.IsCellCorrect())
             {
-                string A = parameters.Sequences[0].Value;
-                string B = parameters.Sequences[1].Value;
-                string C = (parameters.GetNumberOfSequences() > 2) ? parameters.Sequences[2].Value : "@";
-                char a, b, c;
-                a = FetchSign(A, rowIndex, yOffset);
-                b = FetchSign(B, columnIndex, xOffset);
-                c = FetchSign(C, depthIndex, zOffset);
+                List<char> signsToAlign = new List<char>();
+                signsToAlign = GetSignsToAlign(cell, directionVector);
 
-                Cube newCell = new Cube(rowIndex - yOffset, columnIndex - xOffset, depthIndex - zOffset);
-                return ComputeAligningValue(newCell, a, b, c);
+                return ComputeAligningValue(newCell, signsToAlign);
             }
             return parameters.GetIlligalValue();
+        }
+
+        private List<char> GetSignsToAlign(Cube cell, List<int> directionVector)
+        {
+            List<char> signsToAlign = new List<char>
+            {
+                FetchSign(parameters.GetSequenceValue(0), cell.rowIndex, directionVector[0]),
+                FetchSign(parameters.GetSequenceValue(1), cell.columnIndex, directionVector[1])
+            };
+            if (parameters.GetNumberOfSequences() > 2)
+            {
+                signsToAlign.Add(FetchSign(parameters.GetSequenceValue(2), cell.depthIndex, directionVector[2]));
+            }
+            return signsToAlign;
+        }
+
+        protected virtual char FetchSign(string seq, int i, int iOffset)
+        {
+            if(seq == string.Empty)
+            {
+                return '\0';
+            }
+            if (iOffset == 0)
+            {
+                return '-';
+            }
+            return seq[i - iOffset];
+        }
+
+        protected virtual int ComputeAligningValue(Cube cell, List<char> signsToAlign)
+        {
+            int score = array.GetCellValue(cell.rowIndex, cell.columnIndex, cell.depthIndex);
+            for(int  i = 0; i < signsToAlign.Count() - 1; ++i)
+            {
+                for(int j = i + 1; j < signsToAlign.Count(); ++j)
+                {
+                    score += parameters.CostArray.GetLettersAlignmentCost(signsToAlign[i], signsToAlign[j]);
+                }
+            }
+            //score += parameters.CostArray.GetLettersAlignmentCost(a, b);
+            //score += parameters.CostArray.GetLettersAlignmentCost(b, c);
+            //score += parameters.CostArray.GetLettersAlignmentCost(a, c);
+            return score;
         }
 
         public virtual Alignment GetOptimalAlignment()
@@ -148,17 +193,16 @@ namespace StringAlgorithms
             {
                 alignmentStringsBuilders[i] = new StringBuilder();
             }
-           // secondSequenceOfAlignment = new StringBuilder("");
         }
 
         protected virtual void RetrieveAlignment()
         {
+            //we need to start from bottm right cell
             Cube currentCell = array.GetCell(array.rowSize, array.columnSize, array.depthSize);
 
             while (currentCell.IsTopLeftCell() == false)
             {
                 Cube newCell = GoOneStepBack(currentCell);
-
                 currentCell = newCell;
             }
             MakeAlignment();
@@ -166,51 +210,43 @@ namespace StringAlgorithms
 
         protected virtual Cube GoOneStepBack(Cube from)
         {
-            string A = parameters.Sequences[0].Value;
-            string B = parameters.Sequences[1].Value;
-            string C = (parameters.GetNumberOfSequences()>2)?parameters.Sequences[2].Value : "@";
             List<int>[] possibleDirectionInArray = Utils.Utils.Variancy(parameters.GetNumberOfSequences());
             //possibleDirectionInArray[0] = new List<int>() { 1, 1 };
             //possibleDirectionInArray[1] = new List<int>() { 1, 0 };
             //possibleDirectionInArray[2] = new List<int>() { 0, 1 };
-
-            int rowIndex = from.rowIndex;
-            int columnIndex = from.columnIndex;
-            int depthIndex = (parameters.GetNumberOfSequences() == 2) ? 1 : from.depthIndex;
-
-
             Cube newCell = new Cube();
 
             foreach (List<int> directionVector in possibleDirectionInArray)
             {
-                int yOffset = directionVector[0];
-                int xOffset = directionVector[1];
-                int zOffset = (parameters.GetNumberOfSequences() == 2) ? 1 : directionVector[2];
-
+                AddZDimensionIfNecessary(directionVector);
                 int comingFromNeighborCost = ComputeScore(from, directionVector);
                 if (comingFromNeighborCost == from.value)
                 {
-                    char a, b, c;
-                    a = FetchSign(A, rowIndex, yOffset);
-                    b = FetchSign(B, columnIndex, xOffset);
-                    c = FetchSign(C, depthIndex, zOffset);
-                    AddNextSignsOfAlignment(a, b, c);
-                    newCell = array.GetCell(rowIndex - yOffset, columnIndex - xOffset, depthIndex - zOffset);
+                    List<char> signsToAlign = new List<char>();
+                    signsToAlign = GetSignsToAlign(from, directionVector);
+                    AddNextSignsOfAlignment(signsToAlign);
+                    newCell = array.GetCell(GetCellPointedByVector(from, directionVector));
                     break;
                 }
             }
             return newCell;
         }
 
-        protected virtual void AddNextSignsOfAlignment(char a, char b, char c)
+        private void AddNextSignsOfAlignment(List<char> signsToAlign)
         {
-            alignmentStringsBuilders[0].Insert(0, a);
-            alignmentStringsBuilders[1].Insert(0, b);
-            if (parameters.GetNumberOfSequences() > 2)
+            for(int i = 0; i < signsToAlign.Count(); ++i)
             {
-                alignmentStringsBuilders[2].Insert(0, c);
+                alignmentStringsBuilders[i].Insert(0, signsToAlign[i]);
             }
         }
+
+
+
+
+
+
+
+
 
         protected virtual void MakeAlignment()
         {
@@ -224,26 +260,6 @@ namespace StringAlgorithms
             computedAlignment = new Alignment(sequences);
         }
 
-
-
-        protected virtual int ComputeAligningValue(Cube cell, char a, char b, char c)
-        {
-            int score = array.GetCellValue(cell.rowIndex, cell.columnIndex, cell.depthIndex);
-            score += parameters.CostArray.GetLettersAlignmentCost(a, b);
-            score += parameters.CostArray.GetLettersAlignmentCost(b, c);
-            score += parameters.CostArray.GetLettersAlignmentCost(a, c);
-            return score;
-        }
-
-        protected virtual char FetchSign(string seq, int i, int iOffset)
-        {
-            if (iOffset == 0)
-            {
-                return '-';
-            }
-            return seq[i - iOffset];
-        }
-
         public virtual int GetNumberOfOptimalSolutions()
         {
             ComputeAlignmentArrayIfNecessary();
@@ -254,7 +270,6 @@ namespace StringAlgorithms
             optimalSolutionsNumber = CountNumberOfOptimalSolutions(startCell);
             return optimalSolutionsNumber;
         }
-
 
         protected virtual int CountNumberOfOptimalSolutions(Cube cell)
         {
@@ -280,11 +295,6 @@ namespace StringAlgorithms
             }
             return optimalSolutionsNumber;
         }
-
-
-        
-
-        
 
         protected int GetTheBestValue(List<int> list)
         {

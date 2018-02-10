@@ -46,5 +46,17 @@ namespace StringAlgorithms.Utils
                 return false;
             }
         }
+
+        public bool IsCellCorrect()
+        {
+            if (rowIndex < 0 || columnIndex < 0 || depthIndex < 0)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
     }
 }
